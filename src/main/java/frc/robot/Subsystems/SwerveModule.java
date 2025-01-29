@@ -115,26 +115,18 @@ public class SwerveModule {
    */
   public void setDesiredState(SwerveModuleState desiredState) {
     // Optimize the reference state to avoid spinning further than 90 degrees
+    // @SuppressWarnings("deprecation")
+    @SuppressWarnings("deprecation")
     SwerveModuleState state = SwerveModuleState.optimize(desiredState, getRotation());
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput = state.speedMetersPerSecond;
 
-    // final double driveFeedforward =
-    // m_driveFeedforward.calculate(state.speedMetersPerSecond);
-
-    // Calculate the turning motor output from the turning PID controller.
-    // final double turnOutput =
-    // m_turningPIDController.calculate(m_turningEncoder.getPosition().getValueAsDouble(),
-    // state.angle.getRotations());
     final double turnOutput = m_turningPIDController.calculate(m_turningEncoder.getPosition().getValueAsDouble() * 2 * Math.PI,
         state.angle.getRadians());
     showTurnOutput = turnOutput;
 
-    //final double turnFeedforward = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
-
     m_driveMotor.set(driveOutput);
     m_turningMotor.set(-turnOutput);
-    //m_turningMotor.set(TalonSRXControlMode.PercentOutput, turnOutput + turnFeedforward);
   }
 }

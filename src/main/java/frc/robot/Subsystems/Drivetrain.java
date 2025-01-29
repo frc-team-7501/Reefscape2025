@@ -5,7 +5,7 @@
 package frc.robot.Subsystems;
 
 //import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.PigeonIMU; 
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -113,12 +113,11 @@ public class Drivetrain extends SubsystemBase {
    * @param photonYaw     If apriltag 5 or 6 is seen send the yaw
    */
   public void drive(double forward, double strafe, double rotate, boolean fieldRelative, double speedMultiplier,
-      double pixySensorEncoder, double pixyTrigger, double photonYaw, double photonPitch) {
+      double pixySensorEncoder) {
     SwerveModuleState[] swerveModuleStates;
-
     double ySpeed;
     double xSpeed;
-    final double rotationOutput = rotate + ((pixySensorEncoder - 0.5) * pixyTrigger);
+    final double rotationOutput = rotate;
     
     // Get the y speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
@@ -126,7 +125,7 @@ public class Drivetrain extends SubsystemBase {
     if (fieldRelative) {
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forward, 0.02)) * speedMultiplier;
      } else {
-      final double forwardOutput = forward - (photonPitch * 0.01);
+      final double forwardOutput = forward;
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.02)) * speedMultiplier;
      }
 
@@ -136,7 +135,7 @@ public class Drivetrain extends SubsystemBase {
      if (fieldRelative) {
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafe, 0.02)) * speedMultiplier;
      } else {
-      final double strafeOutput = strafe - (photonYaw * 0.01);
+      final double strafeOutput = strafe;
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafeOutput, 0.02)) * speedMultiplier;
      }
 

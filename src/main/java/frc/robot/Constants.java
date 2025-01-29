@@ -9,19 +9,19 @@ public final class Constants {
 
         // DriveTrain 2023 Bot
         public static final int TALONFX_DRIVE_BL = 52;
-        public static final int TALONFX_DRIVE_BR = 53;
-        public static final int TALONFX_DRIVE_FL = 54;
-        public static final int TALONFX_DRIVE_FR = 51;
+        public static final int TALONFX_DRIVE_BR = 51;
+        public static final int TALONFX_DRIVE_FL = 53;
+        public static final int TALONFX_DRIVE_FR = 54;
 
         public static final int SPARKMAX_TURN_BL = 32;
-        public static final int SPARKMAX_TURN_BR = 33;
-        public static final int SPARKMAX_TURN_FL = 34;
-        public static final int SPARKMAX_TURN_FR = 31;
+        public static final int SPARKMAX_TURN_BR = 31;
+        public static final int SPARKMAX_TURN_FL = 33;
+        public static final int SPARKMAX_TURN_FR = 34;
 
         public static final int TURN_CANCODER_BL = 42;
-        public static final int TURN_CANCODER_BR = 43;
-        public static final int TURN_CANCODER_FL = 44;
-        public static final int TURN_CANCODER_FR = 41;
+        public static final int TURN_CANCODER_BR = 41;
+        public static final int TURN_CANCODER_FL = 43;
+        public static final int TURN_CANCODER_FR = 44;
 
         // Other Motors
 
@@ -89,10 +89,10 @@ public final class Constants {
     }
 
     public static final class DriveTrain {
-        public static final Translation2d LOCATION_FRONT_LEFT = new Translation2d(0.238, 0.238);
-        public static final Translation2d LOCATION_FRONT_RIGHT = new Translation2d(0.238, -0.238);
-        public static final Translation2d LOCATION_BACK_LEFT = new Translation2d(-0.238, 0.238);
-        public static final Translation2d LOCATION_BACK_RIGHT = new Translation2d(-0.238, -0.238);
+        public static final Translation2d LOCATION_FRONT_LEFT = new Translation2d(0.3937, 0.238);
+        public static final Translation2d LOCATION_FRONT_RIGHT = new Translation2d(0.3937, -0.238);
+        public static final Translation2d LOCATION_BACK_LEFT = new Translation2d(-0.3937, 0.238);
+        public static final Translation2d LOCATION_BACK_RIGHT = new Translation2d(-0.3937, -0.238);
 
         public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
                 LOCATION_FRONT_LEFT, LOCATION_FRONT_RIGHT, LOCATION_BACK_LEFT, LOCATION_BACK_RIGHT);
