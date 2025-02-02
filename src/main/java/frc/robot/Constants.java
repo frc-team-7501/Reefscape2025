@@ -24,7 +24,9 @@ public final class Constants {
         public static final int TURN_CANCODER_FR = 44;
 
         // Other Motors
-
+        public static final int SPARKMAX_ELEVATOR_R = 35;
+        public static final int SPARKMAX_ELEVATOR_L = 36;
+        
         // MISC CAN Bus
         public static final int PIGEON_IMU = 20;
     }
