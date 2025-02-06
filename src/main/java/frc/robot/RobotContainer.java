@@ -14,12 +14,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 // import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ControllerMapping;
 import frc.robot.Constants.MiscMapping;
+import frc.robot.Commands.ElevatorControlCommand;
 import frc.robot.Commands.ResetGyroYawInstantCommand;
 import frc.robot.Commands.SetIsFieldCentricInstantCommand;
 import frc.robot.Commands.SetSpeedMultiplierInstantCommand;
 import frc.robot.Commands.SwerveDriveManualCommand;
 import frc.robot.Commands.Autonomous.AutonDriveCommand;
 import frc.robot.Subsystems.Drivetrain;
+import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Sensors;
 import frc.robot.utils.ExtendedXboxController;
 
@@ -30,6 +32,8 @@ public class RobotContainer {
     // create subsystems
     private final Drivetrain driveTrain = Drivetrain.getInstance();
     private final Sensors sensors = Sensors.getInstance();
+    private final Elevator elevator = Elevator.getInstance();
+
 
     ////////////////////////////////
     // #region [ AUTON COMMANDS ]
@@ -41,6 +45,8 @@ public class RobotContainer {
     ////////////////////////////////
 
     // Create commands
+
+    // Swerve Control
     private final Command swerveDriveManualCommand = new SwerveDriveManualCommand(
             driveTrain,
             sensors,
@@ -49,14 +55,14 @@ public class RobotContainer {
             () -> m_Xbox.getRightX(),
             () -> m_Xbox.getLeftTriggerAxis(),
             () -> sensors.getIsFieldCentric());
-
-    public RobotContainer() {
-        configureButtonBindings();
-        driveTrain.setDefaultCommand(swerveDriveManualCommand);
-    }
+    
+    // Elevator Manual Control
+    private final Command elevatorControlCommand = new ElevatorControlCommand(elevator, () -> m_Xbox2.getLeftY());
 
     // #region Button Bindings
     private void configureButtonBindings() {
+
+
 
         // Back button on the drive controller resets gyroscope.
         m_Xbox.b_Back().onTrue(new ResetGyroYawInstantCommand(driveTrain));
@@ -73,8 +79,15 @@ public class RobotContainer {
         m_Xbox.b_LeftBumper()
                 .onFalse(new SetIsFieldCentricInstantCommand(sensors, true));
     }
-    // #endregion
+    // #endregion'
 
+    public RobotContainer() {
+
+        configureButtonBindings();
+
+        driveTrain.setDefaultCommand(swerveDriveManualCommand);
+        elevator.setDefaultCommand(elevatorControlCommand);
+    }
     // #region TeleopInit
     public void teleopInit() {
         driveTrain.setBrakeMode(MiscMapping.BRAKE_OFF);

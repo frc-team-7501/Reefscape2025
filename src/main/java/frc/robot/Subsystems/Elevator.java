@@ -12,19 +12,19 @@ import frc.robot.Constants.CANMapping;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new Elevator. */
-  private final SparkMax elevatorMotorL = new SparkMax(CANMapping.SPARKMAX_ELEVATOR_L, MotorType.kBrushless);
-  private final SparkMax elevatorMotorR = new SparkMax(CANMapping.SPARKMAX_ELEVATOR_R, MotorType.kBrushless);
+  private final SparkMax elevatorMotorB = new SparkMax(CANMapping.SPARKMAX_ELEVATOR_B, MotorType.kBrushless);
+  private final SparkMax elevatorMotorT = new SparkMax(CANMapping.SPARKMAX_ELEVATOR_T, MotorType.kBrushless);
   private RelativeEncoder encoder;
   private static Elevator instance;
 
   public Elevator() {
     // ElevatorMotorL.restoreFactoryDefaults();
-    encoder = elevatorMotorL.getEncoder();
+    encoder = elevatorMotorB.getEncoder();
   }
 
   public void resetEncoder() {
-    elevatorMotorL.getEncoder().setPosition(0);
-    elevatorMotorR.getEncoder().setPosition(0);
+    elevatorMotorB.getEncoder().setPosition(0);
+    elevatorMotorT.getEncoder().setPosition(0);
   }
 
   public static Elevator getInstance() {
@@ -42,12 +42,12 @@ public class Elevator extends SubsystemBase {
     return encoder.getPosition();
   }
   public void moveElevator(double speed) {
-    elevatorMotorL.set(speed);
-    elevatorMotorR.set(speed);
+    elevatorMotorB.set(speed);
+    elevatorMotorT.set(speed);
   }
 
   public void stop() {
-    elevatorMotorL.stopMotor();
-    elevatorMotorR.stopMotor();
+    elevatorMotorB.stopMotor();
+    elevatorMotorT.stopMotor();
   }
 }

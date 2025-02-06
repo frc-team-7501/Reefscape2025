@@ -17,6 +17,7 @@ public class ElevatorPIDControlCommand extends PIDCommand {
   private final Elevator elevator;
 
   /** Creates a new LiftPIDControlCommand. */
+  @SuppressWarnings("removal")
   public ElevatorPIDControlCommand(final Elevator elevator, final double position) {
     super(
         // The controller that the command will use
