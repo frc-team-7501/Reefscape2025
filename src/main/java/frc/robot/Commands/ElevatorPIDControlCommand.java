@@ -4,49 +4,38 @@
 
 package frc.robot.Commands;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
-import frc.robot.Subsystems.Elevator;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Subsystems.Elevator;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-
-public class ElevatorPIDControlCommand extends PIDCommand {
+public class ElevatorPIDControlCommand extends Command {
+  /** Creates a new LiftControlCommand. */
   private final Elevator elevator;
+  private final double elevatorPosition;
 
-  /** Creates a new LiftPIDControlCommand. */
-  @SuppressWarnings("removal")
-  public ElevatorPIDControlCommand(final Elevator elevator, final double position) {
-    super(
-        // The controller that the command will use
-        new PIDController(0.04, 0, 0),
-        // This should return the measurement
-        () -> elevator.getElevatorPosition(),
-        // This should return the setpoint (can also be a constant)
-        () -> position,
-        // This uses the output
-        output -> {
-          // Use the output here
-          elevator.moveElevator(position);
-          //SmartDashboard.putNumber("Lift Output", output);
-          SmartDashboard.putNumber("Lift",elevator.getElevatorPosition());
-        });
+  public ElevatorPIDControlCommand(Elevator elevator, double elevatorPosition) {
     // Use addRequirements() here to declare subsystem dependencies.
-    // Configure additional PID options by calling `getController` here.
-    addRequirements(elevator);
     this.elevator = elevator;
-    // Configure additional PID options by calling `getController` here.
-    getController().setTolerance(15);
-    getController().setSetpoint(0);
+    this.elevatorPosition = elevatorPosition;
+    addRequirements(elevator);
   }
 
-   // Called once the command ends or is interrupted.
-   @Override
-   public void end(boolean interrupted) {
-     elevator.moveElevator(0);
-   }
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    elevator.pidSetPosition(elevatorPosition);
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    elevator.stop();
+  }
 
   // Returns true when the command should end.
   @Override

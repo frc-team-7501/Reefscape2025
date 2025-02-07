@@ -24,8 +24,8 @@ public final class Constants {
         public static final int TURN_CANCODER_FR = 44;
 
         // Other Motors
-        public static final int SPARKMAX_ELEVATOR_R = 35;
-        public static final int SPARKMAX_ELEVATOR_L = 36;
+        public static final int SPARKMAX_ELEVATOR_T = 35;
+        public static final int SPARKMAX_ELEVATOR_B = 36;
         
         // MISC CAN Bus
         public static final int PIGEON_IMU = 20;
@@ -36,6 +36,15 @@ public final class Constants {
         public static final int XBOX2 = 1;
     }
 
+    // Elevator position values
+    public static final class ElevatorMapping {
+        public static final double Level0 = 0.0; //pickup level
+        public static final double Level1 = -1.0; //trough drop off level
+        public static final double Level2 = 0.0; //first bar drop off level
+        public static final double Level3 = 0.0; //second bar drop off level
+        public static final double Level4 = 0.0; //top bar drop off level
+
+    }
     public static final class DIOMapping {}
 
     public static final class MiscMapping {

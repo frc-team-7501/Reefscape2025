@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 // import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 // import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ControllerMapping;
+import frc.robot.Constants.ElevatorMapping;
 import frc.robot.Constants.MiscMapping;
 import frc.robot.Commands.ElevatorControlCommand;
+import frc.robot.Commands.ElevatorPIDControlCommand;
 import frc.robot.Commands.ResetGyroYawInstantCommand;
 import frc.robot.Commands.SetIsFieldCentricInstantCommand;
 import frc.robot.Commands.SetSpeedMultiplierInstantCommand;
@@ -72,6 +74,12 @@ public class RobotContainer {
                 .onTrue(new SetSpeedMultiplierInstantCommand(sensors, MiscMapping.TURBO_MULTIPLIER));
         m_Xbox.b_RightBumper()
                 .onFalse(new SetSpeedMultiplierInstantCommand(sensors, MiscMapping.NORMAL_MULTIPLIER));
+
+        // Elevator setpoints
+        m_Xbox2.b_A()
+                .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level0));
+        m_Xbox2.b_B()
+                .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level1));
 
         // Field Centric Toggle
         m_Xbox.b_LeftBumper()

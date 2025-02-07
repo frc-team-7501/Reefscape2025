@@ -37,7 +37,6 @@ public class ElevatorControlCommand extends Command {
       elevatorSpeedDouble = 0;
 
     elevator.moveElevator(elevatorSpeedDouble);
-    SmartDashboard.putNumber("Elevator", elevator.getElevatorPosition());
   }
 
   // Called once the command ends or is interrupted.

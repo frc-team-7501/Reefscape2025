@@ -34,10 +34,9 @@ public class SwerveModule {
   //private final PIDController m_drivePIDController = new PIDController(0.1, 0, 0);
   
   //TODO: refine PID controller for turning PID
-  // Gains are for example purposes only - must be determined for your own robot!
   private final PIDController m_turningPIDController = new PIDController(0.2, 0.02, 0);
   
-  //private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
+  // private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
   //    0.1,
   //    0,
   //    0,
@@ -115,7 +114,6 @@ public class SwerveModule {
    */
   public void setDesiredState(SwerveModuleState desiredState) {
     // Optimize the reference state to avoid spinning further than 90 degrees
-    // @SuppressWarnings("deprecation")
     @SuppressWarnings("deprecation")
     SwerveModuleState state = SwerveModuleState.optimize(desiredState, getRotation());
 
