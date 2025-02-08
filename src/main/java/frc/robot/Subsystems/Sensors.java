@@ -4,11 +4,14 @@
 
 package frc.robot.Subsystems;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DIOMapping;
 import frc.robot.Constants.MiscMapping;
 
 public class Sensors extends SubsystemBase {
-  /** Creates a new Sensors. */
+  /* Creates new Sensors. */
+  private DigitalInput intakeSensor = new DigitalInput(DIOMapping.INTAKE_SENSOR);
   // Other "Fake" Sensors
   private boolean isFieldCentric;
   private double speedMultiplier;
@@ -29,6 +32,10 @@ public class Sensors extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public boolean getIntakeSensor() {
+    return !intakeSensor.get();
   }
 
   public boolean getIsFieldCentric() {

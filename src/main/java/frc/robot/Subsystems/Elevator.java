@@ -35,16 +35,17 @@ public class Elevator extends SubsystemBase {
 
     // PID values
     elevatorMotorBConfig.closedLoop
-        .p(0.01)
-        .i(0.001)
-        .d(0)
-        .outputRange(-0.2, 0.2);
+        .p(0.4)
+        .i(0.0)
+        .d(0.05)
+        .outputRange(-0.3, 0.3);
 
     elevatorMotorB.configure(elevatorMotorBConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // Top motor follows the bottom motor.
     elevatorMotorTConfig.follow(elevatorMotorB.getDeviceId(), false);
     elevatorMotorT.configure(elevatorMotorTConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // SmartDashboard.putNumber("ElevPos", elevatorMotorB.getEncoder().getPosition());
   }
 
   public void resetEncoder() {
@@ -61,6 +62,10 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("ElevPos", elevatorMotorB.getEncoder().getPosition());
+    SmartDashboard.putNumber("ElevPow", elevatorMotorB.getAppliedOutput());
+    SmartDashboard.putNumber("ElevCur", elevatorMotorB.getOutputCurrent());
+
   }
 
   public double getElevatorPosition() {
@@ -70,12 +75,13 @@ public class Elevator extends SubsystemBase {
   // Manual command
   public void moveElevator(double speed) {
     elevatorMotorB.set(speed);
-    SmartDashboard.putNumber("ElevPos", elevatorMotorB.getEncoder().getPosition());
+    // SmartDashboard.putNumber("ElevPos", elevatorMotorB.getEncoder().getPosition());
   }
 
   // PID command
   public void pidSetPosition(double position) {
     elevatorMotorBPID.setReference(position, ControlType.kPosition);
+    // SmartDashboard.putNumber("ElevPos", elevatorMotorB.getEncoder().getPosition());
   }
 
   public void stop() {
