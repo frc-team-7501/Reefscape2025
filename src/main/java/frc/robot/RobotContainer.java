@@ -8,14 +8,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-// import edu.wpi.first.wpilibj2.command.InstantCommand;
-// import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-// import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-// import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-// import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ControllerMapping;
 import frc.robot.Constants.ElevatorMapping;
 import frc.robot.Constants.MiscMapping;
+import frc.robot.Commands.DifferentialControlCommand;
+import frc.robot.Commands.DifferentialPIDControlCommand;
 import frc.robot.Commands.ElevatorControlCommand;
 import frc.robot.Commands.ElevatorPIDControlCommand;
 import frc.robot.Commands.IntakeControlCommand;
@@ -26,103 +23,114 @@ import frc.robot.Commands.SetSpeedMultiplierInstantCommand;
 import frc.robot.Commands.SwerveDriveManualCommand;
 import frc.robot.Commands.Autonomous.AutonDriveCommand;
 import frc.robot.Subsystems.Drivetrain;
+import frc.robot.Subsystems.Differential;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Sensors;
 import frc.robot.utils.ExtendedXboxController;
 
 public class RobotContainer {
-        private final ExtendedXboxController m_Xbox = new ExtendedXboxController(ControllerMapping.XBOX);
-        private final ExtendedXboxController m_Xbox2 = new ExtendedXboxController(ControllerMapping.XBOX2);
+    private final ExtendedXboxController m_Xbox = new ExtendedXboxController(ControllerMapping.XBOX);
+    private final ExtendedXboxController m_Xbox2 = new ExtendedXboxController(ControllerMapping.XBOX2);
 
-        // create subsystems
-        private final Drivetrain driveTrain = Drivetrain.getInstance();
-        private final Sensors sensors = Sensors.getInstance();
-        private final Elevator elevator = Elevator.getInstance();
-        private final Intake intake = Intake.getInstance();
+    // create subsystems
+    private final Differential differential = Differential.getInstance();
+    private final Drivetrain driveTrain = Drivetrain.getInstance();
+    private final Elevator elevator = Elevator.getInstance();
+    private final Sensors sensors = Sensors.getInstance();
+    private final Intake intake = Intake.getInstance();
 
-        ////////////////////////////////
-        // #region [ AUTON COMMANDS ]
+    ////////////////////////////////
+    // #region [ AUTON COMMANDS ]
 
-        // #region DefaultAuton - DO NOT USE, NOT TESTED
-        private final Command DefaultAuton = new AutonDriveCommand(driveTrain, new Pose2d(60, 0, new Rotation2d(0)));
+    // #region DefaultAuton - DO NOT USE, NOT TESTED
+    private final Command DefaultAuton = new AutonDriveCommand(driveTrain, new Pose2d(60, 0, new Rotation2d(0)));
 
-        // #endregion
-        ////////////////////////////////
+    // #endregion
+    ////////////////////////////////
 
-        // Create commands
+    // Create commands
 
-        // Swerve Control
-        private final Command swerveDriveManualCommand = new SwerveDriveManualCommand(
-                        driveTrain,
-                        sensors,
-                        () -> m_Xbox.getLeftY(),
-                        () -> m_Xbox.getLeftX(),
-                        () -> m_Xbox.getRightX(),
-                        () -> m_Xbox.getLeftTriggerAxis(),
-                        () -> sensors.getIsFieldCentric());
+    // Swerve Control
+    private final Command swerveDriveManualCommand = new SwerveDriveManualCommand(
+            driveTrain,
+            sensors,
+            () -> m_Xbox.getLeftY(),
+            () -> m_Xbox.getLeftX(),
+            () -> m_Xbox.getRightX(),
+            () -> m_Xbox.getLeftTriggerAxis(),
+            () -> sensors.getIsFieldCentric());
 
-        // Elevator Manual Control
-        private final Command elevatorControlCommand = new ElevatorControlCommand(elevator, () -> m_Xbox2.getLeftY());
+    // Elevator Manual Control
+    private final Command elevatorControlCommand = new ElevatorControlCommand(elevator, () -> m_Xbox2.getLeftY());
 
-        // #region Button Bindings
-        private void configureButtonBindings() {
+    // Differential Manual Control
+    private final Command differentialControlCommand = new DifferentialControlCommand(differential, () -> m_Xbox2.getRightY(), () -> m_Xbox2.getRightY() * -1);
 
-                // Back button on the drive controller resets gyroscope.
-                m_Xbox.b_Back().onTrue(new ResetGyroYawInstantCommand(driveTrain));
+    // #region Button Bindings
+    private void configureButtonBindings() {
 
-                m_Xbox2.b_Back().onTrue(new ResetElevatorEncodersInstantCommand(elevator));
+        // Back button on the drive controller resets gyroscope.
+        m_Xbox.b_Back().onTrue(new ResetGyroYawInstantCommand(driveTrain));
 
-                // Turbo Button
-                m_Xbox.b_RightBumper()
-                                .onTrue(new SetSpeedMultiplierInstantCommand(sensors, MiscMapping.TURBO_MULTIPLIER));
-                m_Xbox.b_RightBumper()
-                                .onFalse(new SetSpeedMultiplierInstantCommand(sensors, MiscMapping.NORMAL_MULTIPLIER));
+        m_Xbox2.b_Back().onTrue(new ResetElevatorEncodersInstantCommand(elevator));
 
-                // Elevator setpoints
-                m_Xbox2.b_A()
-                                .onTrue(new ParallelCommandGroup(
-                                                new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level0),
-                                                new IntakeControlCommand(intake, sensors, -0.5, false)));
-                m_Xbox2.b_X()
-                                .onTrue(new ParallelCommandGroup(
-                                                new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level2),
-                                                new IntakeControlCommand(intake, sensors, 0.0, false)));
-                m_Xbox2.b_Y()
-                                .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level3));
-                m_Xbox2.b_B()
-                                .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level4));
+        // Turbo Button
+        m_Xbox.b_RightBumper()
+                .onTrue(new SetSpeedMultiplierInstantCommand(sensors, MiscMapping.TURBO_MULTIPLIER));
+        m_Xbox.b_RightBumper()
+                .onFalse(new SetSpeedMultiplierInstantCommand(sensors, MiscMapping.NORMAL_MULTIPLIER));
 
-                // Field Centric Toggle
-                m_Xbox.b_LeftBumper()
-                                .onTrue(new SetIsFieldCentricInstantCommand(sensors, false));
-                m_Xbox.b_LeftBumper()
-                                .onFalse(new SetIsFieldCentricInstantCommand(sensors, true));
-        }
-        // #endregion'
+        // Elevator setpoints
+        m_Xbox2.b_A()
+                .onTrue(new ParallelCommandGroup(
+                        new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level0),
+                        new IntakeControlCommand(intake, sensors, -0.5, false)
+                        //, new DifferentialPIDControlCommand(differential, 0, 0)
+                        ));
+        m_Xbox2.b_X()
+                .onTrue(new ParallelCommandGroup(
+                        new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level2),
+                        new IntakeControlCommand(intake, sensors, 0.0, false)
+                        //, new DifferentialPIDControlCommand(differential, 0, 0)
+                        ));
+        m_Xbox2.b_Y()
+                .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level3));
+        m_Xbox2.b_B()
+                .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level4));
 
-        public RobotContainer() {
+        
+        // Field Centric Toggle
+        m_Xbox.b_LeftBumper()
+                .onTrue(new SetIsFieldCentricInstantCommand(sensors, false));
+        m_Xbox.b_LeftBumper()
+                .onFalse(new SetIsFieldCentricInstantCommand(sensors, true));
+    }
+    // #endregion'
 
-                configureButtonBindings();
+    public RobotContainer() {
 
-                driveTrain.setDefaultCommand(swerveDriveManualCommand);
-                elevator.setDefaultCommand(elevatorControlCommand);
-        }
+        configureButtonBindings();
 
-        // #region TeleopInit
-        public void teleopInit() {
-                driveTrain.setBrakeMode(MiscMapping.BRAKE_OFF);
-        }
-        // #endregion
+        differential.setDefaultCommand(differentialControlCommand);
+        driveTrain.setDefaultCommand(swerveDriveManualCommand);
+        elevator.setDefaultCommand(elevatorControlCommand);
+    }
 
-        // #region AutonomousInit
-        public void autonomousInit() {
-                driveTrain.setBrakeMode(MiscMapping.BRAKE_ON);
-                driveTrain.resetYaw();
-        }
-        // #endregion
+    // #region TeleopInit
+    public void teleopInit() {
+        driveTrain.setBrakeMode(MiscMapping.BRAKE_OFF);
+    }
+    // #endregion
 
-        public Command getAutonomousCommand() {
-                return DefaultAuton;
-        }
+    // #region AutonomousInit
+    public void autonomousInit() {
+        driveTrain.setBrakeMode(MiscMapping.BRAKE_ON);
+        driveTrain.resetYaw();
+    }
+    // #endregion
+
+    public Command getAutonomousCommand() {
+        return DefaultAuton;
+    }
 }

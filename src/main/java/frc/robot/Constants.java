@@ -27,6 +27,8 @@ public final class Constants {
         public static final int SPARKMAX_ELEVATOR_T = 35;
         public static final int SPARKMAX_ELEVATOR_B = 36;
         public static final int INTAKE_TALONSRX = 55;
+        public static final int SPARKMAX_DIFFERENTIAL_R = 37;
+        public static final int SPARKMAX_DIFFERENTIAL_L = 38;
         
         // MISC CAN Bus
         public static final int PIGEON_IMU = 20;
