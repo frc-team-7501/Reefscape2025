@@ -50,6 +50,9 @@ public final class Constants {
     }
     public static final class DIOMapping {
         public static final int INTAKE_SENSOR = 0;
+        public static final int DIFFERENTIAL_ENCODER_R = 1;
+        public static final int DIFFERENTIAL_ENCODER_L = 2;
+
     }
 
     public static final class MiscMapping {
@@ -105,10 +108,10 @@ public final class Constants {
     }
 
     public static final class DriveTrain {
-        public static final Translation2d LOCATION_FRONT_LEFT = new Translation2d(0.3937, 0.238);
-        public static final Translation2d LOCATION_FRONT_RIGHT = new Translation2d(0.3937, -0.238);
-        public static final Translation2d LOCATION_BACK_LEFT = new Translation2d(-0.3937, 0.238);
-        public static final Translation2d LOCATION_BACK_RIGHT = new Translation2d(-0.3937, -0.238);
+        public static final Translation2d LOCATION_FRONT_LEFT = new Translation2d(0.62865, 0.47625);
+        public static final Translation2d LOCATION_FRONT_RIGHT = new Translation2d(0.62865, -0.47625);
+        public static final Translation2d LOCATION_BACK_LEFT = new Translation2d(-0.62865, 0.47625);
+        public static final Translation2d LOCATION_BACK_RIGHT = new Translation2d(-0.62865, -0.47625);
 
         public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
                 LOCATION_FRONT_LEFT, LOCATION_FRONT_RIGHT, LOCATION_BACK_LEFT, LOCATION_BACK_RIGHT);

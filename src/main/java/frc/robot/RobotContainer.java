@@ -65,7 +65,9 @@ public class RobotContainer {
     private final Command elevatorControlCommand = new ElevatorControlCommand(elevator, () -> m_Xbox2.getLeftY());
 
     // Differential Manual Control
-    private final Command differentialControlCommand = new DifferentialControlCommand(differential, () -> m_Xbox2.getRightY(), () -> m_Xbox2.getRightY() * -1);
+    // private final Command differentialControlCommand = new
+    // DifferentialControlCommand(differential, () -> m_Xbox2.getRightY(), () ->
+    // m_Xbox2.getRightY() * -1);
 
     // #region Button Bindings
     private void configureButtonBindings() {
@@ -81,25 +83,29 @@ public class RobotContainer {
         m_Xbox.b_RightBumper()
                 .onFalse(new SetSpeedMultiplierInstantCommand(sensors, MiscMapping.NORMAL_MULTIPLIER));
 
+        // Differential testing
+        m_Xbox.b_A()
+                .onTrue(new DifferentialPIDControlCommand(differential, 0.696, 0.580));
+        m_Xbox.b_B()
+                .onTrue(new DifferentialPIDControlCommand(differential, 0.414, 0.874));
         // Elevator setpoints
         m_Xbox2.b_A()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level0),
                         new IntakeControlCommand(intake, sensors, -0.5, false)
-                        //, new DifferentialPIDControlCommand(differential, 0, 0)
-                        ));
+                // , new DifferentialPIDControlCommand(differential, 0, 0)
+                ));
         m_Xbox2.b_X()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level2),
                         new IntakeControlCommand(intake, sensors, 0.0, false)
-                        //, new DifferentialPIDControlCommand(differential, 0, 0)
-                        ));
+                // , new DifferentialPIDControlCommand(differential, 0, 0)
+                ));
         m_Xbox2.b_Y()
                 .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level3));
         m_Xbox2.b_B()
                 .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level4));
 
-        
         // Field Centric Toggle
         m_Xbox.b_LeftBumper()
                 .onTrue(new SetIsFieldCentricInstantCommand(sensors, false));
@@ -112,7 +118,9 @@ public class RobotContainer {
 
         configureButtonBindings();
 
-        differential.setDefaultCommand(differentialControlCommand);
+        // differential.setDefaultCommand(differentialControlCommand);
+        //differential.setDefaultCommand(differentialPIDControlCommand);
+
         driveTrain.setDefaultCommand(swerveDriveManualCommand);
         elevator.setDefaultCommand(elevatorControlCommand);
     }

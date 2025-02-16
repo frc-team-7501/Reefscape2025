@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Differential;
 
 public class DifferentialPIDControlCommand extends Command {
-  /** Creates a new LiftControlCommand. */
   private final Differential differential;
   private final double differentialPositionR;
   private final double differentialPositionL;
