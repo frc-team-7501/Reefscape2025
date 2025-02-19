@@ -27,8 +27,8 @@ public final class Constants {
         public static final int SPARKMAX_ELEVATOR_T = 35;
         public static final int SPARKMAX_ELEVATOR_B = 36;
         public static final int INTAKE_TALONSRX = 55;
-        public static final int SPARKMAX_DIFFERENTIAL_R = 37;
-        public static final int SPARKMAX_DIFFERENTIAL_L = 38;
+        public static final int SPARKMAX_DIFFERENTIAL_R = 38;
+        public static final int SPARKMAX_DIFFERENTIAL_L = 37;
         
         // MISC CAN Bus
         public static final int PIGEON_IMU = 20;
@@ -60,7 +60,7 @@ public final class Constants {
         public static final boolean BRAKE_OFF = false;
         public static final boolean FIELD_RELATIVE = true;
         public static final double MAXSPEED = 1;
-        public static final double MAXANGULARSPEED = 1.4;
+        public static final double MAXANGULARSPEED = 0.7;
         public static final double NORMAL_MULTIPLIER = 1;
         public static final double TURBO_MULTIPLIER = 1;
         public static final double PHOTON_PITCH_GOAL = 16;

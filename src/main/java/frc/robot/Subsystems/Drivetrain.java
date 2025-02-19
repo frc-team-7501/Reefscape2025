@@ -37,8 +37,8 @@ public class Drivetrain extends SubsystemBase {
       CANMapping.TURN_CANCODER_BR);
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(1);
+  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(1);
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
   private final PigeonIMU m_pigeonIMU = new PigeonIMU(CANMapping.PIGEON_IMU);

@@ -13,12 +13,16 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANMapping;
 import frc.robot.Constants.DIOMapping;
+import edu.wpi.first.wpilibj.Preferences;
+
 
 public class Differential extends SubsystemBase {
   /** Creates a new Differential. */
@@ -35,19 +39,30 @@ public class Differential extends SubsystemBase {
   private final DutyCycleEncoder differentialEncoderR = 
       new DutyCycleEncoder(
         DIOMapping.DIFFERENTIAL_ENCODER_R);
+  private final String KeyL;
+  private final String KeyR;
+  
 
-  private final PIDController differentialPIDControllerL = new PIDController(0.10, 0.0, 0.0);
-  private final PIDController differentialPIDControllerR = new PIDController(0.10, 0.0, 0.0);
+  private final PIDController differentialPIDControllerL = new PIDController(2.0, 0.0, 0.0);
+  private final PIDController differentialPIDControllerR = new PIDController(2.0, 0.0, 0.0);
+  // MDH Change to use Trapezoid PID
+  //private final TrapezoidProfile.Constraints diffConstraintsL = new TrapezoidProfile.Constraints(1.75, 0.75);
+  //private final ProfiledPIDController differentialPPIDControllerL = new ProfiledPIDController(0.10, 0.0, 0.0, diffConstraintsL,0.02 );
 
   public Differential() {
     // Create motors, configuration, and PID
     differentialMotorR = new SparkMax(CANMapping.SPARKMAX_DIFFERENTIAL_R, MotorType.kBrushless);
     differentialMotorL = new SparkMax(CANMapping.SPARKMAX_DIFFERENTIAL_L, MotorType.kBrushless);
     differentialMotorRConfig = new SparkMaxConfig();
-    differentialMotorLConfig = new SparkMaxConfig();
+    differentialMotorRConfig.inverted(true);
+    differentialMotorR.configure(differentialMotorRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // PID values
     
+  }
+
+  private double clampOutput(double val, double limit) {
+    return Math.signum(val) * Math.min(Math.abs(val), limit);
   }
 
   public static Differential getInstance() {
@@ -83,10 +98,13 @@ public class Differential extends SubsystemBase {
 
   // PID command
   public void pidSetPosition(double positionR, double positionL) {
-    differentialMotorR.set(-differentialPIDControllerR.calculate(differentialEncoderR.get(), positionR));
-    differentialMotorL.set(differentialPIDControllerL.calculate(differentialEncoderL.get(), positionL));
-    SmartDashboard.putNumber("DiffPowR",-differentialPIDControllerR.calculate(differentialEncoderR.get(), positionR));
-    SmartDashboard.putNumber("DiffPowL",differentialPIDControllerL.calculate(differentialEncoderL.get(), positionL));
+
+
+    differentialMotorR.set(clampOutput(-differentialPIDControllerR.calculate(differentialEncoderR.get(), positionR), 0.2));
+    differentialMotorL.set(clampOutput (differentialPIDControllerL.calculate(differentialEncoderL.get(), positionL), 0.2));
+    SmartDashboard.putNumber("DiffPowR",clampOutput(-differentialPIDControllerR.calculate(differentialEncoderR.get(), positionR), 0.2));
+    SmartDashboard.putNumber("DiffPowL",clampOutput( differentialPIDControllerL.calculate(differentialEncoderL.get(), positionL), 0.2));
+    SmartDashboard.putNumber("AppOutput", differentialMotorL.getAppliedOutput());
   }
 
   public void stop() {

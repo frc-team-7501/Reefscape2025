@@ -85,9 +85,9 @@ public class RobotContainer {
 
         // Differential testing
         m_Xbox.b_A()
-                .onTrue(new DifferentialPIDControlCommand(differential, 0.696, 0.580));
+                .onTrue(new DifferentialPIDControlCommand(differential, 0.919, 0.380));
         m_Xbox.b_B()
-                .onTrue(new DifferentialPIDControlCommand(differential, 0.414, 0.874));
+                .onTrue(new DifferentialPIDControlCommand(differential, 0.556, 0.758));
         // Elevator setpoints
         m_Xbox2.b_A()
                 .onTrue(new ParallelCommandGroup(
