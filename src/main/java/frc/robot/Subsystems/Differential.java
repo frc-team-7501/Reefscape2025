@@ -41,6 +41,10 @@ public class Differential extends SubsystemBase {
         DIOMapping.DIFFERENTIAL_ENCODER_R);
   private final String KeyL;
   private final String KeyR;
+  private double offsetL = 0;
+  private double offsetR = 0;
+  private double lastRawPositionL = 0;
+  private double lastRawPositionR = 0;
   
 
   private final PIDController differentialPIDControllerL = new PIDController(2.0, 0.0, 0.0);
@@ -56,14 +60,12 @@ public class Differential extends SubsystemBase {
     differentialMotorRConfig = new SparkMaxConfig();
     differentialMotorRConfig.inverted(true);
     differentialMotorR.configure(differentialMotorRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    // PID values
-    
+    this.KeyL = "EncoderOffset_L";
+    this.KeyR = "EncoderOffset_R";
+    this.offsetL = Preferences.getDouble(KeyL, 0);
+    this.offsetR = Preferences.getDouble(KeyR, 0);
   }
 
-  private double clampOutput(double val, double limit) {
-    return Math.signum(val) * Math.min(Math.abs(val), limit);
-  }
 
   public static Differential getInstance() {
     if (instance == null)
@@ -74,10 +76,14 @@ public class Differential extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // Output for the right motor
-    
+
     SmartDashboard.putNumber("DiffPosL", getDifferentialPositionL());
     SmartDashboard.putNumber("DiffPosR", getDifferentialPositionR());
+    SmartDashboard.putNumber("AppOutput", differentialMotorL.getAppliedOutput());
+    SmartDashboard.putNumber("LeftPos", getContinuousPositionL());
+    SmartDashboard.putNumber("RghtPos", getContinuousPositionR());
+    SmartDashboard.putNumber("OffsetL", offsetL);
+    SmartDashboard.putNumber("OffsetR", offsetR);
 
 
   }
@@ -96,15 +102,47 @@ public class Differential extends SubsystemBase {
     differentialMotorL.set(speedL);
   }
 
+  private double clampOutput(double val, double limit) {
+    return Math.signum(val) * Math.min(Math.abs(val), limit);
+  }
+
+  public void updateOffsetIfResetL() {
+    double currentRawL = differentialEncoderL.get();
+    if (Math.abs(currentRawL - lastRawPositionL) > 0.9) {
+      offsetL += lastRawPositionL - currentRawL;
+      Preferences.setDouble(KeyL, offsetL);
+    }
+    lastRawPositionL = currentRawL;
+  }
+
+  public void updateOffsetIfResetR() {
+    double currentRawR = differentialEncoderR.get();
+    SmartDashboard.putNumber("CRawR", currentRawR);
+    if (Math.abs(currentRawR - lastRawPositionR) > 0.9) {
+      offsetR += lastRawPositionR - currentRawR;
+      Preferences.setDouble(KeyR, offsetR);
+    }
+    lastRawPositionR = currentRawR;
+    SmartDashboard.putNumber("lastRawR", lastRawPositionR);
+  }
+
+  public double getContinuousPositionL() {
+    updateOffsetIfResetL();
+    return differentialEncoderL.get() + offsetL;
+  }
+
+  public double getContinuousPositionR() {
+    updateOffsetIfResetR();
+    return differentialEncoderR.get() + offsetR;
+  }
+
   // PID command
   public void pidSetPosition(double positionR, double positionL) {
 
-
-    differentialMotorR.set(clampOutput(-differentialPIDControllerR.calculate(differentialEncoderR.get(), positionR), 0.2));
-    differentialMotorL.set(clampOutput (differentialPIDControllerL.calculate(differentialEncoderL.get(), positionL), 0.2));
-    SmartDashboard.putNumber("DiffPowR",clampOutput(-differentialPIDControllerR.calculate(differentialEncoderR.get(), positionR), 0.2));
-    SmartDashboard.putNumber("DiffPowL",clampOutput( differentialPIDControllerL.calculate(differentialEncoderL.get(), positionL), 0.2));
-    SmartDashboard.putNumber("AppOutput", differentialMotorL.getAppliedOutput());
+    differentialMotorR.set(clampOutput(-differentialPIDControllerR.calculate(getContinuousPositionR(), positionR), 0.05));
+    differentialMotorL.set(clampOutput (differentialPIDControllerL.calculate(getContinuousPositionL(), positionL), 0.2));
+    SmartDashboard.putNumber("DiffPowR",clampOutput(-differentialPIDControllerR.calculate(getContinuousPositionR(), positionR), 0.2));
+    SmartDashboard.putNumber("DiffPowL",clampOutput( differentialPIDControllerL.calculate(getContinuousPositionL(), positionL), 0.2));
   }
 
   public void stop() {
