@@ -22,7 +22,6 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     //intakeCamera = CameraServer.startAutomaticCapture(0);
-    //launchCamera = CameraServer.startAutomaticCapture(1);
   }
 
   @Override

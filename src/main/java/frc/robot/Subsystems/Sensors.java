@@ -5,9 +5,12 @@
 package frc.robot.Subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DIOMapping;
 import frc.robot.Constants.MiscMapping;
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Sensors extends SubsystemBase {
   /* Creates new Sensors. */
@@ -16,6 +19,12 @@ public class Sensors extends SubsystemBase {
   private boolean isFieldCentric;
   private double speedMultiplier;
   private static Sensors instance;
+  private PhotonCamera photonCamera = new PhotonCamera("reefCam"); 
+  private int targetID;
+  private PhotonTrackedTarget target;
+  private double photonYaw;
+  private double photonArea;
+
 
   public Sensors() {
     // Set the default delivery method to Launcher.
@@ -53,4 +62,47 @@ public class Sensors extends SubsystemBase {
   public void setSpeedMultiplier(double multiplier) {
     speedMultiplier = multiplier;
   }
+
+  public double getPhotonVisionYaw() {
+    var result = photonCamera.getLatestResult();
+    if (result.hasTargets()) {
+      // Sees a target
+      target = result.getBestTarget();
+      targetID = target.getFiducialId();
+      SmartDashboard.putNumber("photonYaw", target.getYaw());
+      if ((targetID >= 6 && targetID <= 11) || (targetID >= 17 && targetID <= 22)) {
+        photonYaw = target.getYaw();
+        return photonYaw;
+      } else {
+        return 0.0;
+      }
+    } else {
+      // Doesn't see a target
+      return 0.0;
+    }
+  }
+
+  public double getPhotonVisionArea() {
+    var result = photonCamera.getLatestResult();
+    SmartDashboard.putBoolean("hasTarget", result.hasTargets());
+    if (result.hasTargets()) {
+      // Sees a target
+      target = result.getBestTarget();
+      targetID = target.getFiducialId();
+      SmartDashboard.putNumber("targetID", targetID);
+      SmartDashboard.putNumber("photonArea", target.getArea());
+      if ((targetID >= 6 && targetID <= 11) || (targetID >= 17 && targetID <= 22)) {
+        photonArea = target.getArea();
+        return photonArea - MiscMapping.PHOTON_AREA_GOAL;
+      } else {
+        return 0.0;
+      }
+    } else {
+      // Doesn't see a target
+      return 0.0;
+    }
+  }
+
+
+  
 }

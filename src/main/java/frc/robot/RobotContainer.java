@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.ControllerMapping;
+import frc.robot.Constants.DifferentialMapping;
 import frc.robot.Constants.ElevatorMapping;
 import frc.robot.Constants.MiscMapping;
 import frc.robot.Commands.DifferentialControlCommand;
@@ -85,9 +86,10 @@ public class RobotContainer {
 
         // Differential testing
         m_Xbox.b_A()
-                .onTrue(new DifferentialPIDControlCommand(differential, 0.919, 0.380));
+                .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION, DifferentialMapping.LOWER_LEFT_POSITION));
         m_Xbox.b_B()
-                .onTrue(new DifferentialPIDControlCommand(differential, 0.556, 0.758));
+                .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.UPPER_LEFT_POSITION));
+
         // Elevator setpoints
         m_Xbox2.b_A()
                 .onTrue(new ParallelCommandGroup(

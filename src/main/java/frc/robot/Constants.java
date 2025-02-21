@@ -52,7 +52,15 @@ public final class Constants {
         public static final int INTAKE_SENSOR = 0;
         public static final int DIFFERENTIAL_ENCODER_R = 1;
         public static final int DIFFERENTIAL_ENCODER_L = 2;
+    }
 
+    public static final class DifferentialMapping {
+        // Coaxial Map
+        public static final double LOWER_RIGHT_POSITION = 0.12;
+        public static final double LOWER_LEFT_POSITION = 0.06;
+        public static final double UPPER_RIGHT_POSITION = 0.54;
+        public static final double UPPER_LEFT_POSITION = 0.46;
+        // Differential Map
     }
 
     public static final class MiscMapping {
@@ -63,7 +71,7 @@ public final class Constants {
         public static final double MAXANGULARSPEED = 0.7;
         public static final double NORMAL_MULTIPLIER = 1;
         public static final double TURBO_MULTIPLIER = 1;
-        public static final double PHOTON_PITCH_GOAL = 16;
+        public static final double PHOTON_AREA_GOAL = 15;
         public static final double xConversionInches = 39.2 / 77; // 39.2 units / 77 inches
         public static final double yConversionInches = -39.47 / 78; // negate so left is negative, right is positive
     }
