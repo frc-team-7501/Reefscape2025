@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANMapping;
 
 public class Intake extends SubsystemBase {
-  private final TalonSRX m_IntakeMotor = new TalonSRX(CANMapping.INTAKE_TALONSRX);
+  private final TalonSRX m_IntakeMotor = new TalonSRX(CANMapping.BUCKET_TALONSRX);
   private static Intake instance;
   
   /** Creates a new Intake. */

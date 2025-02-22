@@ -126,7 +126,7 @@ public class Drivetrain extends SubsystemBase {
     if (fieldRelative) {
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forward, 0.02)) * speedMultiplier;
      } else {
-      final double forwardOutput = forward;
+      final double forwardOutput = forward - (photonArea * 0.01);
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.02)) * speedMultiplier;
      }
 
@@ -137,6 +137,7 @@ public class Drivetrain extends SubsystemBase {
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafe, 0.02)) * speedMultiplier;
      } else {
       final double strafeOutput = strafe - (photonYaw * 0.01);
+      SmartDashboard.putNumber("strafe",strafeOutput);
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafeOutput, 0.02)) * speedMultiplier;
      }
 

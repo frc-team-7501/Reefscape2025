@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.ControllerMapping;
 import frc.robot.Constants.DifferentialMapping;
 import frc.robot.Constants.ElevatorMapping;
+import frc.robot.Constants.FunnelMapping;
 import frc.robot.Constants.MiscMapping;
+import frc.robot.Commands.ClimbControlCommand;
 import frc.robot.Commands.DifferentialControlCommand;
 import frc.robot.Commands.DifferentialPIDControlCommand;
 import frc.robot.Commands.ElevatorControlCommand;
@@ -23,9 +25,13 @@ import frc.robot.Commands.SetIsFieldCentricInstantCommand;
 import frc.robot.Commands.SetSpeedMultiplierInstantCommand;
 import frc.robot.Commands.SwerveDriveManualCommand;
 import frc.robot.Commands.Autonomous.AutonDriveCommand;
+import frc.robot.Commands.FunnelControlCommand;
+import frc.robot.Commands.FunnelPIDControlCommand;
 import frc.robot.Subsystems.Drivetrain;
+import frc.robot.Subsystems.Climb;
 import frc.robot.Subsystems.Differential;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Sensors;
 import frc.robot.utils.ExtendedXboxController;
@@ -40,6 +46,8 @@ public class RobotContainer {
     private final Elevator elevator = Elevator.getInstance();
     private final Sensors sensors = Sensors.getInstance();
     private final Intake intake = Intake.getInstance();
+    private final Funnel funnel = Funnel.getInstance();
+    private final Climb climb = Climb.getInstance();
 
     ////////////////////////////////
     // #region [ AUTON COMMANDS ]
@@ -63,12 +71,17 @@ public class RobotContainer {
             () -> sensors.getIsFieldCentric());
 
     // Elevator Manual Control
-    private final Command elevatorControlCommand = new ElevatorControlCommand(elevator, () -> m_Xbox2.getLeftY());
+    // private final Command elevatorControlCommand = new
+    // ElevatorControlCommand(elevator, () -> m_Xbox2.getLeftY());
+
+    // Climb Manual Control
+    private final Command climbControlCommand = new ClimbControlCommand(climb, () -> m_Xbox2.getLeftY() * 0.5);
+
+    // Funnel Manual Control
+    private final Command funnelControlCommand = new FunnelControlCommand(funnel, () -> m_Xbox2.getRightY());
 
     // Differential Manual Control
-    // private final Command differentialControlCommand = new
-    // DifferentialControlCommand(differential, () -> m_Xbox2.getRightY(), () ->
-    // m_Xbox2.getRightY() * -1);
+    // private final Command differentialControlCommand = new DifferentialControlCommand(differential, () -> m_Xbox2.getRightY(), () -> m_Xbox2.getRightY() * -1);
 
     // #region Button Bindings
     private void configureButtonBindings() {
@@ -76,6 +89,7 @@ public class RobotContainer {
         // Back button on the drive controller resets gyroscope.
         m_Xbox.b_Back().onTrue(new ResetGyroYawInstantCommand(driveTrain));
 
+        // Reset the differential encoders.
         m_Xbox2.b_Back().onTrue(new ResetElevatorEncodersInstantCommand(elevator));
 
         // Turbo Button
@@ -86,16 +100,25 @@ public class RobotContainer {
 
         // Differential testing
         m_Xbox.b_A()
-                .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION, DifferentialMapping.LOWER_LEFT_POSITION));
+                .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION,
+                        DifferentialMapping.LOWER_LEFT_POSITION));
         m_Xbox.b_B()
-                .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.UPPER_LEFT_POSITION));
+                .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
+                        DifferentialMapping.UPPER_LEFT_POSITION));
+
+        // Funnel positions
+        m_Xbox.b_X()
+                .onTrue(new FunnelPIDControlCommand(funnel, FunnelMapping.UPPER_FUN));
+
+        m_Xbox.b_Y()
+                .onTrue(new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN));
 
         // Elevator setpoints
         m_Xbox2.b_A()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level0),
-                        new IntakeControlCommand(intake, sensors, -0.5, false)
-                // , new DifferentialPIDControlCommand(differential, 0, 0)
+                        new IntakeControlCommand(intake, sensors, -0.5, false),
+                        new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION, DifferentialMapping.LOWER_LEFT_POSITION)
                 ));
         m_Xbox2.b_X()
                 .onTrue(new ParallelCommandGroup(
@@ -105,6 +128,7 @@ public class RobotContainer {
                 ));
         m_Xbox2.b_Y()
                 .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level3));
+
         m_Xbox2.b_B()
                 .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level4));
 
@@ -121,10 +145,12 @@ public class RobotContainer {
         configureButtonBindings();
 
         // differential.setDefaultCommand(differentialControlCommand);
-        //differential.setDefaultCommand(differentialPIDControlCommand);
+        // differential.setDefaultCommand(differentialPIDControlCommand);
 
         driveTrain.setDefaultCommand(swerveDriveManualCommand);
-        elevator.setDefaultCommand(elevatorControlCommand);
+        // elevator.setDefaultCommand(elevatorControlCommand);
+        funnel.setDefaultCommand(funnelControlCommand);
+        climb.setDefaultCommand(climbControlCommand);
     }
 
     // #region TeleopInit

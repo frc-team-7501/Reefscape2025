@@ -26,10 +26,12 @@ public final class Constants {
         // Other Motors
         public static final int SPARKMAX_ELEVATOR_T = 35;
         public static final int SPARKMAX_ELEVATOR_B = 36;
-        public static final int INTAKE_TALONSRX = 55;
+        public static final int BUCKET_TALONSRX = 55;
         public static final int SPARKMAX_DIFFERENTIAL_R = 38;
         public static final int SPARKMAX_DIFFERENTIAL_L = 37;
-        
+        public static final int TALONFX_CLIMB = 56;
+        public static final int SPARKMAX_FUNNEL = 39;
+                
         // MISC CAN Bus
         public static final int PIGEON_IMU = 20;
     }
@@ -46,21 +48,26 @@ public final class Constants {
         public static final double Level2 = -10.0; //first bar drop off level
         public static final double Level3 = -18.0; //second bar drop off level
         public static final double Level4 = -24.0; //top bar drop off level
-
-    }
-    public static final class DIOMapping {
-        public static final int INTAKE_SENSOR = 0;
-        public static final int DIFFERENTIAL_ENCODER_R = 1;
-        public static final int DIFFERENTIAL_ENCODER_L = 2;
     }
 
     public static final class DifferentialMapping {
         // Coaxial Map
-        public static final double LOWER_RIGHT_POSITION = 0.12;
-        public static final double LOWER_LEFT_POSITION = 0.06;
-        public static final double UPPER_RIGHT_POSITION = 0.54;
-        public static final double UPPER_LEFT_POSITION = 0.46;
+        public static final double LOWER_RIGHT_POSITION = 0.14;
+        public static final double LOWER_LEFT_POSITION = 0.02;
+        public static final double UPPER_RIGHT_POSITION = 0.59;
+        public static final double UPPER_LEFT_POSITION = 0.45;
         // Differential Map
+    }
+
+    public static final class FunnelMapping {
+        public static final double UPPER_FUN = 0;
+        public static final double LOWER_FUN = 6.285714626312;
+    }
+
+    public static final class DIOMapping {
+        public static final int INTAKE_SENSOR = 0;
+        public static final int DIFFERENTIAL_ENCODER_R = 1;
+        public static final int DIFFERENTIAL_ENCODER_L = 2;
     }
 
     public static final class MiscMapping {
