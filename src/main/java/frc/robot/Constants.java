@@ -44,7 +44,7 @@ public final class Constants {
     // Elevator position values
     public static final class ElevatorMapping {
         public static final double Level0 = -0.5; //pickup level
-        //public static final double Level1 = -6.0; //trough drop off level
+        // public static final double Level1 = -6.0; //trough drop off level
         public static final double Level2 = -10.0; //first bar drop off level
         public static final double Level3 = -18.0; //second bar drop off level
         public static final double Level4 = -24.0; //top bar drop off level
@@ -54,10 +54,13 @@ public final class Constants {
         // Coaxial Map
         public static final double LOWER_RIGHT_POSITION = 0.14;
         public static final double LOWER_LEFT_POSITION = 0.02;
-        public static final double UPPER_RIGHT_POSITION = 0.59;
-        public static final double UPPER_LEFT_POSITION = 0.45;
+        public static final double UPPER_RIGHT_POSITION = LOWER_RIGHT_POSITION + 0.45;
+        public static final double UPPER_LEFT_POSITION = LOWER_LEFT_POSITION + 0.45;
+        public static final double LEFT_REEF_POSITION = LOWER_LEFT_POSITION + 0.43;
+        public static final double RIGHT_REEF_POSITION = LOWER_LEFT_POSITION + 0.47;
         // Differential Map
     }
+
 
     public static final class FunnelMapping {
         public static final double UPPER_FUN = 0;
@@ -75,10 +78,10 @@ public final class Constants {
         public static final boolean BRAKE_OFF = false;
         public static final boolean FIELD_RELATIVE = true;
         public static final double MAXSPEED = 1;
-        public static final double MAXANGULARSPEED = 0.7;
+        public static final double MAXANGULARSPEED = 0.2;
         public static final double NORMAL_MULTIPLIER = 1;
         public static final double TURBO_MULTIPLIER = 1;
-        public static final double PHOTON_AREA_GOAL = 15;
+        public static final double PHOTON_AREA_GOAL = 19;
         public static final double xConversionInches = 39.2 / 77; // 39.2 units / 77 inches
         public static final double yConversionInches = -39.47 / 78; // negate so left is negative, right is positive
     }

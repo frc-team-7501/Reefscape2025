@@ -53,7 +53,7 @@ public class SwerveDriveManualCommand extends Command {
     driveTrain.drive(
         (Math.signum(forwardSupplier.getAsDouble()) * Math.pow(forwardSupplier.getAsDouble(), 2)),
         (Math.signum(strafeSupplier.getAsDouble()) * Math.pow(strafeSupplier.getAsDouble(), 2)),
-        (Math.signum(rotateSupplier.getAsDouble()) * Math.pow(rotateSupplier.getAsDouble(), 2)),
+        rotateSupplier.getAsDouble(),
         fieldRelative.getAsBoolean(),
         sensors.getSpeedMultiplier(),
         pixyTriggerSupplier.getAsDouble(),

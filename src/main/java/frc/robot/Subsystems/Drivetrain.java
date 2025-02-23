@@ -37,8 +37,8 @@ public class Drivetrain extends SubsystemBase {
       CANMapping.TURN_CANCODER_BR);
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(1);
-  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(1);
+  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
   private final PigeonIMU m_pigeonIMU = new PigeonIMU(CANMapping.PIGEON_IMU);
@@ -102,6 +102,10 @@ public class Drivetrain extends SubsystemBase {
     setModuleStates(swerveModuleStates);
   }
 
+  private double clampOutput(double val, double limit) {
+    return Math.signum(val) * Math.min(Math.abs(val), limit);
+  }
+
   /**
    * Method to drive the robot using joystick info.
    *
@@ -126,8 +130,8 @@ public class Drivetrain extends SubsystemBase {
     if (fieldRelative) {
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forward, 0.02)) * speedMultiplier;
      } else {
-      final double forwardOutput = forward - (photonArea * 0.01);
-      xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.02)) * speedMultiplier;
+      final double forwardOutput = forward - (clampOutput(photonArea * 0.01, 0.4));
+      xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.01)) * speedMultiplier;
      }
 
     // Get the x speed or sideways/strafe speed. We are inverting this because
@@ -136,9 +140,9 @@ public class Drivetrain extends SubsystemBase {
      if (fieldRelative) {
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafe, 0.02)) * speedMultiplier;
      } else {
-      final double strafeOutput = strafe - (photonYaw * 0.01);
+      final double strafeOutput = strafe - (clampOutput(photonYaw * 0.01, 0.4));
       SmartDashboard.putNumber("strafe",strafeOutput);
-      ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafeOutput, 0.02)) * speedMultiplier;
+      ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafeOutput, 0.01)) * speedMultiplier;
      }
 
     // Get the rate of angular rotation. We are inverting this because we want a

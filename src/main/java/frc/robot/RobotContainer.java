@@ -7,7 +7,11 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ControllerMapping;
 import frc.robot.Constants.DifferentialMapping;
 import frc.robot.Constants.ElevatorMapping;
@@ -24,7 +28,9 @@ import frc.robot.Commands.ResetGyroYawInstantCommand;
 import frc.robot.Commands.SetIsFieldCentricInstantCommand;
 import frc.robot.Commands.SetSpeedMultiplierInstantCommand;
 import frc.robot.Commands.SwerveDriveManualCommand;
+import frc.robot.Commands.Autonomous.AutonAutoAlignCommand;
 import frc.robot.Commands.Autonomous.AutonDriveCommand;
+import frc.robot.Commands.Autonomous.AutonFunnelCommand;
 import frc.robot.Commands.FunnelControlCommand;
 import frc.robot.Commands.FunnelPIDControlCommand;
 import frc.robot.Subsystems.Drivetrain;
@@ -53,7 +59,21 @@ public class RobotContainer {
     // #region [ AUTON COMMANDS ]
 
     // #region DefaultAuton - DO NOT USE, NOT TESTED
-    private final Command DefaultAuton = new AutonDriveCommand(driveTrain, new Pose2d(60, 0, new Rotation2d(0)));
+    private final Command DefaultAuton = new SequentialCommandGroup(
+        new InstantCommand(
+                    () -> driveTrain.resetOdometry(new Pose2d(0, 0, new Rotation2d(0))),
+                    driveTrain),
+        new AutonDriveCommand(driveTrain, new Pose2d(-24, 0, new Rotation2d(0))), 
+        new ParallelRaceGroup(
+            new AutonAutoAlignCommand(driveTrain, sensors),
+            new WaitCommand(2)
+        ),
+        new AutonFunnelCommand(funnel, FunnelMapping.LOWER_FUN)
+        
+        // "Elevator stuff here"
+        // new AutonDriveCommand(driveTrain, new Pose2d(-24, -134, new Rotation2d(0))),
+        // new AutonDriveCommand(driveTrain, new Pose2d(-35, -134, new Rotation2d(0)))
+        );
 
     // #endregion
     ////////////////////////////////
@@ -81,7 +101,9 @@ public class RobotContainer {
     private final Command funnelControlCommand = new FunnelControlCommand(funnel, () -> m_Xbox2.getRightY());
 
     // Differential Manual Control
-    // private final Command differentialControlCommand = new DifferentialControlCommand(differential, () -> m_Xbox2.getRightY(), () -> m_Xbox2.getRightY() * -1);
+    // private final Command differentialControlCommand = new
+    // DifferentialControlCommand(differential, () -> m_Xbox2.getRightY(), () ->
+    // m_Xbox2.getRightY() * -1);
 
     // #region Button Bindings
     private void configureButtonBindings() {
@@ -118,25 +140,46 @@ public class RobotContainer {
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level0),
                         new IntakeControlCommand(intake, sensors, -0.5, false),
-                        new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION, DifferentialMapping.LOWER_LEFT_POSITION)
-                ));
+                        new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION,
+                                DifferentialMapping.LOWER_LEFT_POSITION)));
         m_Xbox2.b_X()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level2),
-                        new IntakeControlCommand(intake, sensors, 0.0, false)
-                // , new DifferentialPIDControlCommand(differential, 0, 0)
-                ));
+                        new IntakeControlCommand(intake, sensors, 0.0, false),
+                        new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
+                                DifferentialMapping.UPPER_LEFT_POSITION)));
         m_Xbox2.b_Y()
-                .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level3));
+                .onTrue(new ParallelCommandGroup(
+                        new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level3),
+                        new IntakeControlCommand(intake, sensors, 0.0, false),
+                        new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
+                                DifferentialMapping.UPPER_LEFT_POSITION)));
 
         m_Xbox2.b_B()
-                .onTrue(new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level4));
+                .onTrue(new ParallelCommandGroup(
+                        new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level4),
+                        new IntakeControlCommand(intake, sensors, 0.0, false),
+                        new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
+                                DifferentialMapping.UPPER_LEFT_POSITION)));
 
         // Field Centric Toggle
         m_Xbox.b_LeftBumper()
                 .onTrue(new SetIsFieldCentricInstantCommand(sensors, false));
         m_Xbox.b_LeftBumper()
                 .onFalse(new SetIsFieldCentricInstantCommand(sensors, true));
+
+        // Reef scoring selection
+        m_Xbox2.b_RightBumper().onTrue(new DifferentialPIDControlCommand(differential,
+                DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.RIGHT_REEF_POSITION));
+
+        m_Xbox2.b_RightBumper().onFalse(new DifferentialPIDControlCommand(differential,
+                DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.UPPER_LEFT_POSITION));
+
+        m_Xbox2.b_LeftBumper().onTrue(new DifferentialPIDControlCommand(differential,
+                DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.LEFT_REEF_POSITION));
+
+        m_Xbox2.b_LeftBumper().onFalse(new DifferentialPIDControlCommand(differential,
+                DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.UPPER_LEFT_POSITION));
     }
     // #endregion'
 
