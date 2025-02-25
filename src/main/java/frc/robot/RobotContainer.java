@@ -60,20 +60,19 @@ public class RobotContainer {
 
     // #region DefaultAuton - DO NOT USE, NOT TESTED
     private final Command DefaultAuton = new SequentialCommandGroup(
-        new InstantCommand(
+            new InstantCommand(
                     () -> driveTrain.resetOdometry(new Pose2d(0, 0, new Rotation2d(0))),
                     driveTrain),
-        new AutonDriveCommand(driveTrain, new Pose2d(-24, 0, new Rotation2d(0))), 
-        new ParallelRaceGroup(
-            new AutonAutoAlignCommand(driveTrain, sensors),
-            new WaitCommand(2)
-        ),
-        new AutonFunnelCommand(funnel, FunnelMapping.LOWER_FUN)
-        
-        // "Elevator stuff here"
-        // new AutonDriveCommand(driveTrain, new Pose2d(-24, -134, new Rotation2d(0))),
-        // new AutonDriveCommand(driveTrain, new Pose2d(-35, -134, new Rotation2d(0)))
-        );
+            new AutonDriveCommand(driveTrain, new Pose2d(-24, 0, new Rotation2d(0))),
+            new ParallelRaceGroup(
+                    new AutonAutoAlignCommand(driveTrain, sensors),
+                    new WaitCommand(2)),
+            new AutonFunnelCommand(funnel, FunnelMapping.LOWER_FUN)
+
+    // "Elevator stuff here"
+    // new AutonDriveCommand(driveTrain, new Pose2d(-24, -134, new Rotation2d(0))),
+    // new AutonDriveCommand(driveTrain, new Pose2d(-35, -134, new Rotation2d(0)))
+    );
 
     // #endregion
     ////////////////////////////////
@@ -115,15 +114,25 @@ public class RobotContainer {
         m_Xbox2.b_Back().onTrue(new ResetElevatorEncodersInstantCommand(elevator));
 
         // Turbo Button
+        // m_Xbox.b_RightBumper()
+        // .onTrue(new SetSpeedMultiplierInstantCommand(sensors,
+        // MiscMapping.TURBO_MULTIPLIER));
+        // m_Xbox.b_RightBumper()
+        // .onFalse(new SetSpeedMultiplierInstantCommand(sensors,
+        // MiscMapping.NORMAL_MULTIPLIER));
+
+        // Output
         m_Xbox.b_RightBumper()
-                .onTrue(new SetSpeedMultiplierInstantCommand(sensors, MiscMapping.TURBO_MULTIPLIER));
+                .onTrue(new IntakeControlCommand(intake, sensors, 1.0, true));
         m_Xbox.b_RightBumper()
-                .onFalse(new SetSpeedMultiplierInstantCommand(sensors, MiscMapping.NORMAL_MULTIPLIER));
+                .onFalse(new IntakeControlCommand(intake, sensors, 0.0, true));
 
         // Differential testing
         m_Xbox.b_A()
-                .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION,
-                        DifferentialMapping.LOWER_LEFT_POSITION));
+                .onTrue(new ParallelCommandGroup(
+                        new IntakeControlCommand(intake, sensors, -1.0, false),
+                        new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION,
+                                DifferentialMapping.LOWER_LEFT_POSITION)));
         m_Xbox.b_B()
                 .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
                         DifferentialMapping.UPPER_LEFT_POSITION));
@@ -154,7 +163,6 @@ public class RobotContainer {
                         new IntakeControlCommand(intake, sensors, 0.0, false),
                         new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
                                 DifferentialMapping.UPPER_LEFT_POSITION)));
-
         m_Xbox2.b_B()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level4),

@@ -144,22 +144,21 @@ public class Drivetrain extends SubsystemBase {
       SmartDashboard.putNumber("strafe",strafeOutput);
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafeOutput, 0.01)) * speedMultiplier;
      }
-
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
     final var rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
 
-    // SmartDashboard.putNumber("xSpeed", xSpeed);
-    // SmartDashboard.putNumber("ySpeed", ySpeed);
+    SmartDashboard.putNumber("xSpeed", xSpeed);
+    SmartDashboard.putNumber("ySpeed", ySpeed);
     // SmartDashboard.putNumber("rotation", rot);
     // SmartDashboard.putNumber("back left position", m_backRight.showRotation() %
     // (Math.PI * 2));
     // SmartDashboard.putNumber("back left turn output",
     // m_backRight.showTurnPower());
     SmartDashboard.putNumber("Pigeon Yaw", getGyroYaw());
-    SmartDashboard.putNumber("Pixy Output", rotationOutput);
+    // SmartDashboard.putNumber("Pixy Output", rotationOutput);
 
     if (fieldRelative) {
       swerveModuleStates = Constants.DriveTrain.KINEMATICS.toSwerveModuleStates(

@@ -48,18 +48,18 @@ public class Differential extends SubsystemBase {
   // MDH Change to use Trapezoid PID
 
   private final TrapezoidProfile.Constraints diffConstraints = new
-  TrapezoidProfile.Constraints(1.5, 1);
+  TrapezoidProfile.Constraints(1.0, 0.5);
 
   private final ProfiledPIDController differentialPIDControllerL = new 
-  ProfiledPIDController(2.0, 0.0, 0.0, diffConstraints,0.02 );
+  ProfiledPIDController(5.0, 3.0, 0.0, diffConstraints,0.02 );
 
   private final ProfiledPIDController differentialPIDControllerR = new 
-  ProfiledPIDController(2.0, 0.0, 0.0, diffConstraints,0.02 );
+  ProfiledPIDController(4.0, 1.5, 0.0, diffConstraints,0.02);
 
   public Differential() {
     // Create motors, configuration, and PID
-    differentialMotorR = new SparkMax(CANMapping.SPARKMAX_DIFFERENTIAL_R, MotorType.kBrushless);
-    differentialMotorL = new SparkMax(CANMapping.SPARKMAX_DIFFERENTIAL_L, MotorType.kBrushless);
+    differentialMotorR = new SparkMax(CANMapping.SPARKMAX_DIFFERENTIAL_R, MotorType.kBrushed);
+    differentialMotorL = new SparkMax(CANMapping.SPARKMAX_DIFFERENTIAL_L, MotorType.kBrushed);
 
     differentialMotorRConfig = new SparkMaxConfig();
 
@@ -137,12 +137,9 @@ public class Differential extends SubsystemBase {
   // PID command
   public void pidSetPosition(double positionR, double positionL) {
 
-    differentialMotorR.set(clampOutput(-differentialPIDControllerR.calculate(getContinuousPositionR(), positionR), 0.5));
-    differentialMotorL.set(clampOutput( differentialPIDControllerL.calculate(getContinuousPositionL(), positionL), 0.5));
-    SmartDashboard.putNumber("DiffPowR",
-        clampOutput(-differentialPIDControllerR.calculate(getContinuousPositionR(), positionR), 0.2));
-    SmartDashboard.putNumber("DiffPowL",
-        clampOutput(differentialPIDControllerL.calculate(getContinuousPositionL(), positionL), 0.2));
+    differentialMotorR.set(clampOutput(-differentialPIDControllerR.calculate(getContinuousPositionR(), positionR), 0.35));
+    differentialMotorL.set(clampOutput( differentialPIDControllerL.calculate(getContinuousPositionL(), positionL), 0.50));
+    // differentialMotorL.set(clampOutput( differentialPIDControllerL.calculate(getContinuousPositionL(), positionL) + ((getContinuousPositionL() - 0.09) * 0.25), 0.50));
   }
 
   public void stop() {

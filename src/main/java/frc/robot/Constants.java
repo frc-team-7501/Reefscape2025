@@ -45,15 +45,15 @@ public final class Constants {
     public static final class ElevatorMapping {
         public static final double Level0 = -0.5; //pickup level
         // public static final double Level1 = -6.0; //trough drop off level
-        public static final double Level2 = -10.0; //first bar drop off level
-        public static final double Level3 = -18.0; //second bar drop off level
+        public static final double Level2 = -0.5; //first bar drop off level
+        public static final double Level3 = -1.0; //second bar drop off level
         public static final double Level4 = -24.0; //top bar drop off level
     }
 
     public static final class DifferentialMapping {
         // Coaxial Map
-        public static final double LOWER_RIGHT_POSITION = 0.14;
-        public static final double LOWER_LEFT_POSITION = 0.02;
+        public static final double LOWER_RIGHT_POSITION = 0.15;
+        public static final double LOWER_LEFT_POSITION = 0.03;
         public static final double UPPER_RIGHT_POSITION = LOWER_RIGHT_POSITION + 0.45;
         public static final double UPPER_LEFT_POSITION = LOWER_LEFT_POSITION + 0.45;
         public static final double LEFT_REEF_POSITION = LOWER_LEFT_POSITION + 0.43;
