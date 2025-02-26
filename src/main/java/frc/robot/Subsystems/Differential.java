@@ -28,33 +28,30 @@ public class Differential extends SubsystemBase {
   private final SparkMax differentialMotorR;
   private final SparkMax differentialMotorL;
   private static Differential instance;
-  private SparkClosedLoopController differentialMotorRPID;
-  private SparkClosedLoopController differentialMotorLPID;
   private SparkMaxConfig differentialMotorRConfig;
-  private SparkMaxConfig differentialMotorLConfig;
   private final DutyCycleEncoder differentialEncoderL = new DutyCycleEncoder(
       DIOMapping.DIFFERENTIAL_ENCODER_L);
   private final DutyCycleEncoder differentialEncoderR = new DutyCycleEncoder(
       DIOMapping.DIFFERENTIAL_ENCODER_R);
-  private final String KeyL;
-  private final String KeyR;
   private double offsetL = 0;
   private double offsetR = 0;
   private double lastRawL = 0;
   private double lastRawR = 0;
+  private double Kp = 5.0;
+  private double Ki = 0.0;
+  private double Kd = 0.0;
 
   // private final PIDController differentialPIDControllerL = new PIDController(2.0, 0.0, 0.0);
   // private final PIDController differentialPIDControllerR = new PIDController(2.0, 0.0, 0.0);
-  // MDH Change to use Trapezoid PID
-
+  
   private final TrapezoidProfile.Constraints diffConstraints = new
   TrapezoidProfile.Constraints(1.0, 0.5);
 
   private final ProfiledPIDController differentialPIDControllerL = new 
-  ProfiledPIDController(5.0, 3.0, 0.0, diffConstraints,0.02 );
+  ProfiledPIDController(Kp, Ki, Kd, diffConstraints, 0.02 );
 
   private final ProfiledPIDController differentialPIDControllerR = new 
-  ProfiledPIDController(4.0, 1.5, 0.0, diffConstraints,0.02);
+  ProfiledPIDController(Kp, Ki, Kd, diffConstraints, 0.02);
 
   public Differential() {
     // Create motors, configuration, and PID
@@ -67,8 +64,8 @@ public class Differential extends SubsystemBase {
 
     differentialEncoderR.setInverted(true);
 
-    this.KeyL = "EncoderOffset_L";
-    this.KeyR = "EncoderOffset_R";
+    // differentialPIDControllerL.reset(getDifferentialPositionL(), 0.0);
+    // differentialPIDControllerR.reset(getDifferentialPositionR(), 0.0);
   }
 
   public static Differential getInstance() {
@@ -84,6 +81,7 @@ public class Differential extends SubsystemBase {
     SmartDashboard.putNumber("AppOutputR", differentialMotorR.getAppliedOutput());
     SmartDashboard.putNumber("LeftPos", getContinuousPositionL());
     SmartDashboard.putNumber("RghtPos", getContinuousPositionR());
+    SmartDashboard.putNumber("setpoint", differentialPIDControllerL.getPositionError());
   }
 
   public double getDifferentialPositionL() {
@@ -131,13 +129,13 @@ public class Differential extends SubsystemBase {
 
   public double getContinuousPositionR() {
     updateOffsetIfResetR();
-    return differentialEncoderR.get() + offsetR;
+    return differentialEncoderR.get() + offsetR - 0.11;
   }
 
   // PID command
   public void pidSetPosition(double positionR, double positionL) {
 
-    differentialMotorR.set(clampOutput(-differentialPIDControllerR.calculate(getContinuousPositionR(), positionR), 0.35));
+    differentialMotorR.set(clampOutput(-differentialPIDControllerR.calculate(getContinuousPositionR(), positionR), 0.50));
     differentialMotorL.set(clampOutput( differentialPIDControllerL.calculate(getContinuousPositionL(), positionL), 0.50));
     // differentialMotorL.set(clampOutput( differentialPIDControllerL.calculate(getContinuousPositionL(), positionL) + ((getContinuousPositionL() - 0.09) * 0.25), 0.50));
   }

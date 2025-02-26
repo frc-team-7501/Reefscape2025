@@ -43,6 +43,7 @@ public class SwerveDriveManualCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    
     // TODO: create a stop in Drivetrain
     // driveTrain.stop();
   }
@@ -51,8 +52,8 @@ public class SwerveDriveManualCommand extends Command {
   @Override
   public void execute() {
     driveTrain.drive(
-        (Math.signum(forwardSupplier.getAsDouble()) * Math.pow(forwardSupplier.getAsDouble(), 2)),
-        (Math.signum(strafeSupplier.getAsDouble()) * Math.pow(strafeSupplier.getAsDouble(), 2)),
+        forwardSupplier.getAsDouble(),
+        strafeSupplier.getAsDouble(),
         rotateSupplier.getAsDouble(),
         fieldRelative.getAsBoolean(),
         sensors.getSpeedMultiplier(),

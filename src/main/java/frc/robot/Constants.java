@@ -43,22 +43,25 @@ public final class Constants {
 
     // Elevator position values
     public static final class ElevatorMapping {
-        public static final double Level0 = -0.5; //pickup level
+        public static final double Level0 = -0.2; //pickup level
         // public static final double Level1 = -6.0; //trough drop off level
         public static final double Level2 = -0.5; //first bar drop off level
-        public static final double Level3 = -1.0; //second bar drop off level
-        public static final double Level4 = -24.0; //top bar drop off level
+        public static final double Level3 = -4.0; //second bar drop off level
+        public static final double Level4 = -25.75; //top bar drop off level
     }
 
     public static final class DifferentialMapping {
-        // Coaxial Map
-        public static final double LOWER_RIGHT_POSITION = 0.15;
-        public static final double LOWER_LEFT_POSITION = 0.03;
-        public static final double UPPER_RIGHT_POSITION = LOWER_RIGHT_POSITION + 0.45;
-        public static final double UPPER_LEFT_POSITION = LOWER_LEFT_POSITION + 0.45;
-        public static final double LEFT_REEF_POSITION = LOWER_LEFT_POSITION + 0.43;
-        public static final double RIGHT_REEF_POSITION = LOWER_LEFT_POSITION + 0.47;
         // Differential Map
+        public static final double LOWER_RIGHT_POSITION = 0.01;
+        public static final double LOWER_LEFT_POSITION = 0.01;
+        public static final double UPPER_RIGHT_POSITION = LOWER_RIGHT_POSITION + 0.48;
+        public static final double UPPER_LEFT_POSITION = LOWER_LEFT_POSITION + 0.48;
+        // Turn the bucket left or right
+        public static final double LD_RIGHT_REEF_POSITION = UPPER_LEFT_POSITION + 0.05;  // Right
+        public static final double RD_RIGHT_REEF_POSITION = UPPER_RIGHT_POSITION - 0.05;  // Right
+        public static final double LD_LEFT_REEF_POSITION = UPPER_LEFT_POSITION - 0.05;  // Left
+        public static final double RD_LEFT_REEF_POSITION = UPPER_RIGHT_POSITION + 0.05;  // Left
+
     }
 
 
@@ -79,7 +82,7 @@ public final class Constants {
         public static final boolean FIELD_RELATIVE = true;
         public static final double MAXSPEED = 1;
         public static final double MAXANGULARSPEED = 0.2;
-        public static final double NORMAL_MULTIPLIER = 1;
+        public static final double NORMAL_MULTIPLIER = 0.6;
         public static final double TURBO_MULTIPLIER = 1;
         public static final double PHOTON_AREA_GOAL = 19;
         public static final double xConversionInches = 39.2 / 77; // 39.2 units / 77 inches
@@ -126,10 +129,10 @@ public final class Constants {
     }
 
     public static final class DriveTrain {
-        public static final Translation2d LOCATION_FRONT_LEFT = new Translation2d(0.62865, 0.47625);
-        public static final Translation2d LOCATION_FRONT_RIGHT = new Translation2d(0.62865, -0.47625);
-        public static final Translation2d LOCATION_BACK_LEFT = new Translation2d(-0.62865, 0.47625);
-        public static final Translation2d LOCATION_BACK_RIGHT = new Translation2d(-0.62865, -0.47625);
+        public static final Translation2d LOCATION_FRONT_LEFT = new Translation2d(0.62865/2, 0.47625/2);
+        public static final Translation2d LOCATION_FRONT_RIGHT = new Translation2d(0.62865/2, -0.47625/2);
+        public static final Translation2d LOCATION_BACK_LEFT = new Translation2d(-0.62865/2, 0.47625/2);
+        public static final Translation2d LOCATION_BACK_RIGHT = new Translation2d(-0.62865/2, -0.47625/2);
 
         public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
                 LOCATION_FRONT_LEFT, LOCATION_FRONT_RIGHT, LOCATION_BACK_LEFT, LOCATION_BACK_RIGHT);

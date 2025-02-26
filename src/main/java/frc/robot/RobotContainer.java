@@ -128,14 +128,14 @@ public class RobotContainer {
                 .onFalse(new IntakeControlCommand(intake, sensors, 0.0, true));
 
         // Differential testing
-        m_Xbox.b_A()
-                .onTrue(new ParallelCommandGroup(
-                        new IntakeControlCommand(intake, sensors, -1.0, false),
-                        new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION,
-                                DifferentialMapping.LOWER_LEFT_POSITION)));
-        m_Xbox.b_B()
-                .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
-                        DifferentialMapping.UPPER_LEFT_POSITION));
+        //m_Xbox.b_A()
+        //       .onTrue(new ParallelCommandGroup(
+        //                new IntakeControlCommand(intake, sensors, -1.0, false),
+        //                new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION,
+        //                        DifferentialMapping.LOWER_LEFT_POSITION)));
+        //m_Xbox.b_B()
+        //        .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
+        //                DifferentialMapping.UPPER_LEFT_POSITION));
 
         // Funnel positions
         m_Xbox.b_X()
@@ -148,25 +148,25 @@ public class RobotContainer {
         m_Xbox2.b_A()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level0),
-                        new IntakeControlCommand(intake, sensors, -0.5, false),
+                        new IntakeControlCommand(intake, sensors, -1.0, false),
                         new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION,
                                 DifferentialMapping.LOWER_LEFT_POSITION)));
         m_Xbox2.b_X()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level2),
-                        new IntakeControlCommand(intake, sensors, 0.0, false),
+                        new IntakeControlCommand(intake, sensors, -1.0, false),
                         new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
                                 DifferentialMapping.UPPER_LEFT_POSITION)));
         m_Xbox2.b_Y()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level3),
-                        new IntakeControlCommand(intake, sensors, 0.0, false),
+                        new IntakeControlCommand(intake, sensors, -1.0, false),
                         new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
                                 DifferentialMapping.UPPER_LEFT_POSITION)));
         m_Xbox2.b_B()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level4),
-                        new IntakeControlCommand(intake, sensors, 0.0, false),
+                        new IntakeControlCommand(intake, sensors, -1.0, false),
                         new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
                                 DifferentialMapping.UPPER_LEFT_POSITION)));
 
@@ -178,13 +178,13 @@ public class RobotContainer {
 
         // Reef scoring selection
         m_Xbox2.b_RightBumper().onTrue(new DifferentialPIDControlCommand(differential,
-                DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.RIGHT_REEF_POSITION));
+                DifferentialMapping.RD_RIGHT_REEF_POSITION, DifferentialMapping.LD_RIGHT_REEF_POSITION));
 
         m_Xbox2.b_RightBumper().onFalse(new DifferentialPIDControlCommand(differential,
                 DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.UPPER_LEFT_POSITION));
 
         m_Xbox2.b_LeftBumper().onTrue(new DifferentialPIDControlCommand(differential,
-                DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.LEFT_REEF_POSITION));
+                DifferentialMapping.RD_LEFT_REEF_POSITION, DifferentialMapping.LD_LEFT_REEF_POSITION));
 
         m_Xbox2.b_LeftBumper().onFalse(new DifferentialPIDControlCommand(differential,
                 DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.UPPER_LEFT_POSITION));

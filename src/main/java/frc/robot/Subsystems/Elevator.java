@@ -65,7 +65,7 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("ElevPos", elevatorMotorB.getEncoder().getPosition());
     SmartDashboard.putNumber("ElevPow", elevatorMotorB.getAppliedOutput());
     SmartDashboard.putNumber("ElevCur", elevatorMotorB.getOutputCurrent());
-
+    SmartDashboard.putNumber("ElevTemp", elevatorMotorB.getMotorTemperature());
   }
 
   public double getElevatorPosition() {

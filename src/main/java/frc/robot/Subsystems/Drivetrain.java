@@ -73,7 +73,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void resetYaw() {
-    m_pigeonIMU.setYaw(0);
+    m_pigeonIMU.setYaw(180);
   }
 
   public double getGyroYaw() {
