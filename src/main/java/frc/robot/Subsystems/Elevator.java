@@ -63,9 +63,9 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("ElevPos", elevatorMotorB.getEncoder().getPosition());
-    SmartDashboard.putNumber("ElevPow", elevatorMotorB.getAppliedOutput());
-    SmartDashboard.putNumber("ElevCur", elevatorMotorB.getOutputCurrent());
-    SmartDashboard.putNumber("ElevTemp", elevatorMotorB.getMotorTemperature());
+    // SmartDashboard.putNumber("ElevPow", elevatorMotorB.getAppliedOutput());
+    // SmartDashboard.putNumber("ElevCur", elevatorMotorB.getOutputCurrent());
+    // SmartDashboard.putNumber("ElevTemp", elevatorMotorB.getMotorTemperature());
   }
 
   public double getElevatorPosition() {

@@ -45,25 +45,13 @@ public final class Constants {
     public static final class ElevatorMapping {
         public static final double Level0 = -0.2; //pickup level
         // public static final double Level1 = -6.0; //trough drop off level
-        public static final double Level2 = -0.5; //first bar drop off level
+        public static final double Level2 = -4.1; //first bar drop off level
         public static final double Level3 = -4.0; //second bar drop off level
         public static final double Level4 = -25.75; //top bar drop off level
+        // Algae
+        public static final double LEVEL10 = -5.9; // CHANGE Lower Algae
+        public static final double LEVEL11 = -11.54; // Upper Algae
     }
-
-    public static final class DifferentialMapping {
-        // Differential Map
-        public static final double LOWER_RIGHT_POSITION = 0.01;
-        public static final double LOWER_LEFT_POSITION = 0.01;
-        public static final double UPPER_RIGHT_POSITION = LOWER_RIGHT_POSITION + 0.48;
-        public static final double UPPER_LEFT_POSITION = LOWER_LEFT_POSITION + 0.48;
-        // Turn the bucket left or right
-        public static final double LD_RIGHT_REEF_POSITION = UPPER_LEFT_POSITION + 0.05;  // Right
-        public static final double RD_RIGHT_REEF_POSITION = UPPER_RIGHT_POSITION - 0.05;  // Right
-        public static final double LD_LEFT_REEF_POSITION = UPPER_LEFT_POSITION - 0.05;  // Left
-        public static final double RD_LEFT_REEF_POSITION = UPPER_RIGHT_POSITION + 0.05;  // Left
-
-    }
-
 
     public static final class FunnelMapping {
         public static final double UPPER_FUN = 0;
@@ -74,6 +62,7 @@ public final class Constants {
         public static final int INTAKE_SENSOR = 0;
         public static final int DIFFERENTIAL_ENCODER_R = 1;
         public static final int DIFFERENTIAL_ENCODER_L = 2;
+        public static final int CLIMB_SENSOR = 3;
     }
 
     public static final class MiscMapping {

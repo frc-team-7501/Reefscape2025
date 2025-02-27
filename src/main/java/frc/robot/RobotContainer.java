@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ControllerMapping;
-import frc.robot.Constants.DifferentialMapping;
 import frc.robot.Constants.ElevatorMapping;
 import frc.robot.Constants.FunnelMapping;
 import frc.robot.Constants.MiscMapping;
@@ -25,6 +24,7 @@ import frc.robot.Commands.ElevatorPIDControlCommand;
 import frc.robot.Commands.IntakeControlCommand;
 import frc.robot.Commands.ResetElevatorEncodersInstantCommand;
 import frc.robot.Commands.ResetGyroYawInstantCommand;
+import frc.robot.Commands.SetDifferentialLevelInstantCommand;
 import frc.robot.Commands.SetIsFieldCentricInstantCommand;
 import frc.robot.Commands.SetSpeedMultiplierInstantCommand;
 import frc.robot.Commands.SwerveDriveManualCommand;
@@ -94,7 +94,7 @@ public class RobotContainer {
     // ElevatorControlCommand(elevator, () -> m_Xbox2.getLeftY());
 
     // Climb Manual Control
-    private final Command climbControlCommand = new ClimbControlCommand(climb, () -> m_Xbox2.getLeftY() * 0.5);
+    private final Command climbControlCommand = new ClimbControlCommand(climb, () -> m_Xbox2.getLeftY() * 0.5, sensors);
 
     // Funnel Manual Control
     private final Command funnelControlCommand = new FunnelControlCommand(funnel, () -> m_Xbox2.getRightY());
@@ -127,15 +127,6 @@ public class RobotContainer {
         m_Xbox.b_RightBumper()
                 .onFalse(new IntakeControlCommand(intake, sensors, 0.0, true));
 
-        // Differential testing
-        //m_Xbox.b_A()
-        //       .onTrue(new ParallelCommandGroup(
-        //                new IntakeControlCommand(intake, sensors, -1.0, false),
-        //                new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION,
-        //                        DifferentialMapping.LOWER_LEFT_POSITION)));
-        //m_Xbox.b_B()
-        //        .onTrue(new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
-        //                DifferentialMapping.UPPER_LEFT_POSITION));
 
         // Funnel positions
         m_Xbox.b_X()
@@ -149,26 +140,43 @@ public class RobotContainer {
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level0),
                         new IntakeControlCommand(intake, sensors, -1.0, false),
-                        new DifferentialPIDControlCommand(differential, DifferentialMapping.LOWER_RIGHT_POSITION,
-                                DifferentialMapping.LOWER_LEFT_POSITION)));
+                        new SetDifferentialLevelInstantCommand(sensors, 0),
+                        new DifferentialPIDControlCommand(differential, sensors, 2)));
         m_Xbox2.b_X()
-                .onTrue(new ParallelCommandGroup(
-                        new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level2),
-                        new IntakeControlCommand(intake, sensors, -1.0, false),
-                        new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
-                                DifferentialMapping.UPPER_LEFT_POSITION)));
+                .onTrue(new SequentialCommandGroup(
+                        new SetDifferentialLevelInstantCommand(sensors, 1),
+                        new ParallelRaceGroup(
+                                new DifferentialPIDControlCommand(differential, sensors, 2),
+                                new WaitCommand(1)),
+                        new ParallelCommandGroup(
+                                new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level2),
+                                new IntakeControlCommand(intake, sensors, -1.0, false),
+                                new SetDifferentialLevelInstantCommand(sensors, 2),
+                                new DifferentialPIDControlCommand(differential, sensors, 2))));
         m_Xbox2.b_Y()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level3),
                         new IntakeControlCommand(intake, sensors, -1.0, false),
-                        new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
-                                DifferentialMapping.UPPER_LEFT_POSITION)));
+                        new SetDifferentialLevelInstantCommand(sensors, 3),
+                        new DifferentialPIDControlCommand(differential, sensors, 2)));
         m_Xbox2.b_B()
                 .onTrue(new ParallelCommandGroup(
                         new ElevatorPIDControlCommand(elevator, ElevatorMapping.Level4),
                         new IntakeControlCommand(intake, sensors, -1.0, false),
-                        new DifferentialPIDControlCommand(differential, DifferentialMapping.UPPER_RIGHT_POSITION,
-                                DifferentialMapping.UPPER_LEFT_POSITION)));
+                        new SetDifferentialLevelInstantCommand(sensors, 4),
+                        new DifferentialPIDControlCommand(differential, sensors, 2)));
+        // Algae removal positions
+        m_Xbox.b_B()
+        .onTrue(new SequentialCommandGroup(
+            new SetDifferentialLevelInstantCommand(sensors, 11),
+            new ParallelRaceGroup(
+                    new DifferentialPIDControlCommand(differential, sensors, 2),
+                    new WaitCommand(2)),
+                    new ParallelCommandGroup(
+                new ElevatorPIDControlCommand(elevator, ElevatorMapping.LEVEL11),
+                new IntakeControlCommand(intake, sensors, 1.0, false),
+                new SetDifferentialLevelInstantCommand(sensors, 11),
+                new DifferentialPIDControlCommand(differential, sensors, 2))));
 
         // Field Centric Toggle
         m_Xbox.b_LeftBumper()
@@ -177,19 +185,23 @@ public class RobotContainer {
                 .onFalse(new SetIsFieldCentricInstantCommand(sensors, true));
 
         // Reef scoring selection
-        m_Xbox2.b_RightBumper().onTrue(new DifferentialPIDControlCommand(differential,
-                DifferentialMapping.RD_RIGHT_REEF_POSITION, DifferentialMapping.LD_RIGHT_REEF_POSITION));
+        m_Xbox2.b_RightBumper().onTrue(new ParallelCommandGroup(
+                new IntakeControlCommand(intake, sensors, 1.0, false),
+                new DifferentialPIDControlCommand(differential, sensors, 1)));
 
-        m_Xbox2.b_RightBumper().onFalse(new DifferentialPIDControlCommand(differential,
-                DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.UPPER_LEFT_POSITION));
+        m_Xbox2.b_RightBumper().onFalse(new ParallelCommandGroup(
+                new IntakeControlCommand(intake, sensors, 1.0, false),
+                new DifferentialPIDControlCommand(differential, sensors, 2)));
 
-        m_Xbox2.b_LeftBumper().onTrue(new DifferentialPIDControlCommand(differential,
-                DifferentialMapping.RD_LEFT_REEF_POSITION, DifferentialMapping.LD_LEFT_REEF_POSITION));
+        m_Xbox2.b_LeftBumper().onTrue(new ParallelCommandGroup(
+                new IntakeControlCommand(intake, sensors, 1.0, false),
+                new DifferentialPIDControlCommand(differential, sensors, 0)));
 
-        m_Xbox2.b_LeftBumper().onFalse(new DifferentialPIDControlCommand(differential,
-                DifferentialMapping.UPPER_RIGHT_POSITION, DifferentialMapping.UPPER_LEFT_POSITION));
+        m_Xbox2.b_LeftBumper().onFalse(new ParallelCommandGroup(
+                new IntakeControlCommand(intake, sensors, 1.0, false),
+                new DifferentialPIDControlCommand(differential, sensors, 2)));
     }
-    // #endregion'
+    // #endregion
 
     public RobotContainer() {
 

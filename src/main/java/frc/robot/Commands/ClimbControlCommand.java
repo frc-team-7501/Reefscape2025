@@ -7,21 +7,23 @@ package frc.robot.Commands;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Climb;
+import frc.robot.Subsystems.Sensors;
 
 public class ClimbControlCommand extends Command {
   // Creates a new ClimbControlCommand.
   private final Climb Climb;
   private final DoubleSupplier ClimbPower;
   private double ClimbPowerDouble;
+  private final Sensors sensor;
 
-  public ClimbControlCommand(Climb Climb, DoubleSupplier ClimbPower) {
+  public ClimbControlCommand(Climb Climb, DoubleSupplier ClimbPower, Sensors sensor) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.Climb = Climb;
     this.ClimbPower = ClimbPower;
     addRequirements(Climb);
+    this.sensor = sensor;
   }
 
   // Called when the command is initially scheduled.
@@ -33,11 +35,9 @@ public class ClimbControlCommand extends Command {
   @Override
   public void execute() {
     ClimbPowerDouble = ClimbPower.getAsDouble();
-    // // Stop the lift from moving down (only) if either limit switch is triggered
-    // if ((Climb.getClimbPosition() > 12.0) && ClimbPowerDouble > 0) {
-    // Climb.moveClimb(0);
-    // } else {
-
+    if (sensor.getClimbSensor()) {
+      ClimbPowerDouble = 0.0;
+    }
     if (ClimbPowerDouble < 0.2 && ClimbPowerDouble > -0.2) {
       ClimbPowerDouble = 0.0;
     }

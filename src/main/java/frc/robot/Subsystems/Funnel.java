@@ -55,9 +55,6 @@ public class Funnel extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("FunPos", funnelMotor.getEncoder().getPosition());
-    SmartDashboard.putNumber("FunPow", funnelMotor.getAppliedOutput());
-    SmartDashboard.putNumber("FunCur", funnelMotor.getOutputCurrent());
   }
 
   public double getFunnelPosition() {

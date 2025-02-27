@@ -15,6 +15,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class Sensors extends SubsystemBase {
   /* Creates new Sensors. */
   private DigitalInput intakeSensor = new DigitalInput(DIOMapping.INTAKE_SENSOR);
+  private DigitalInput climbSensor = new DigitalInput(DIOMapping.CLIMB_SENSOR);
   // Other "Fake" Sensors
   private boolean isFieldCentric;
   private double speedMultiplier;
@@ -24,6 +25,7 @@ public class Sensors extends SubsystemBase {
   private PhotonTrackedTarget target;
   private double photonYaw;
   private double photonArea;
+  private int diffLevel;
 
 
   public Sensors() {
@@ -41,10 +43,23 @@ public class Sensors extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("climbSen", climbSensor.get());
+  }
+
+  public void setDifferentialLevel(int diffLevelin) {
+    this.diffLevel = diffLevelin;
+  }
+
+  public int getDifferentialLevel() {
+    return diffLevel; 
   }
 
   public boolean getIntakeSensor() {
     return !intakeSensor.get();
+  }
+
+  public boolean getClimbSensor() {
+    return !climbSensor.get();
   }
 
   public boolean getIsFieldCentric() {
