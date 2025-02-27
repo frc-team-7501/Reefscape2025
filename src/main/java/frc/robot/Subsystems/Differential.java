@@ -38,7 +38,7 @@ public class Differential extends SubsystemBase {
   private double lastRawL = 0;
   private double lastRawR = 0;
   private double Kp = 5.0;
-  private double Ki = 0.0;
+  private double Ki = 4.0;
   private double Kd = 0.0;
 
   // private final PIDController differentialPIDControllerL = new PIDController(2.0, 0.0, 0.0);

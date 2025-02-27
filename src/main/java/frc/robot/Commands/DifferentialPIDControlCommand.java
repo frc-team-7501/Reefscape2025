@@ -49,20 +49,24 @@ public class DifferentialPIDControlCommand extends Command {
         differentialPositionL = 0.13;
       } else if (diffLevel == 2) {
         // set differential for level two
-        differentialPositionR = -0.046;
+        differentialPositionR = -0.03;
         differentialPositionL = 0.29;
       } else if (diffLevel == 3) {
         // set differential for level three
-        differentialPositionR = 0.49;
-        differentialPositionL = 0.49;
+        differentialPositionR = 0.44;
+        differentialPositionL = 0.44;
       } else if (diffLevel == 4) {
         // set differential for level four
-        differentialPositionR = 0.49;
-        differentialPositionL = 0.49;
+        differentialPositionR = 0.44;
+        differentialPositionL = 0.44;
       } else if (diffLevel == 11) {
-        // set differential for Algae Upper Level
+        // set differential for Algae UPPER Level
         differentialPositionR = 0.10;
         differentialPositionL = 0.43;
+      } else if (diffLevel == 10) {
+        // set differential for Algae LOWER Level
+        differentialPositionR = 0.42;
+        differentialPositionL = 0.42;
       } else {
         // set differential for else
         differentialPositionR = 0.13;
@@ -73,12 +77,20 @@ public class DifferentialPIDControlCommand extends Command {
        *******************************************************/
       if (reefLRCSelector == 0) {
         // Left
-        differentialPositionL -= 0.05;
-        differentialPositionR += 0.05;
-      } else if (reefLRCSelector == 1) {
+        differentialPositionL -= 0.04;
+        differentialPositionR += 0.04;
+        if (diffLevel == 2) {
+          differentialPositionL += 0.02;
+          differentialPositionR -= 0.02;
+        }
+       } else if (reefLRCSelector == 1) {
         // Right
-        differentialPositionL += 0.05;
-        differentialPositionR -= 0.05;
+        differentialPositionL += 0.04;
+        differentialPositionR -= 0.04;
+        if (diffLevel == 2) {
+          differentialPositionL -= 0.02;
+          differentialPositionR += 0.02;
+        }
       } else if (reefLRCSelector == 2) {
         // Center
         differentialPositionL += 0.0;

@@ -39,7 +39,7 @@ public class Funnel extends SubsystemBase {
 
         funnelMotor.configure(funnelMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    // SmartDashboard.putNumber("FunnPos", funnelMotor.getEncoder().getPosition());
+    // SmartDashboard.putNumber("FunPos", funnelMotor.getEncoder().getPosition());
   }
 
   public void resetEncoder() {

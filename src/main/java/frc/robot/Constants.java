@@ -41,21 +41,9 @@ public final class Constants {
         public static final int XBOX2 = 1;
     }
 
-    // Elevator position values
-    public static final class ElevatorMapping {
-        public static final double Level0 = -0.2; //pickup level
-        // public static final double Level1 = -6.0; //trough drop off level
-        public static final double Level2 = -4.1; //first bar drop off level
-        public static final double Level3 = -4.0; //second bar drop off level
-        public static final double Level4 = -25.75; //top bar drop off level
-        // Algae
-        public static final double LEVEL10 = -5.9; // CHANGE Lower Algae
-        public static final double LEVEL11 = -11.54; // Upper Algae
-    }
-
     public static final class FunnelMapping {
-        public static final double UPPER_FUN = 0;
-        public static final double LOWER_FUN = 6.285714626312;
+        public static final double UPPER_FUN = 0.0;
+        public static final double LOWER_FUN = 6.0;
     }
 
     public static final class DIOMapping {
@@ -70,7 +58,7 @@ public final class Constants {
         public static final boolean BRAKE_OFF = false;
         public static final boolean FIELD_RELATIVE = true;
         public static final double MAXSPEED = 1;
-        public static final double MAXANGULARSPEED = 0.2;
+        public static final double MAXANGULARSPEED = 0.35;
         public static final double NORMAL_MULTIPLIER = 0.6;
         public static final double TURBO_MULTIPLIER = 1;
         public static final double PHOTON_AREA_GOAL = 19;
