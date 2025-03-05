@@ -77,8 +77,8 @@ public class Differential extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("AppOutputL", differentialMotorL.getAppliedOutput());
-    SmartDashboard.putNumber("AppOutputR", differentialMotorR.getAppliedOutput());
+    // SmartDashboard.putNumber("AppOutputL", differentialMotorL.getAppliedOutput());
+    // SmartDashboard.putNumber("AppOutputR", differentialMotorR.getAppliedOutput());
     SmartDashboard.putNumber("LeftPos", getContinuousPositionL());
     SmartDashboard.putNumber("RghtPos", getContinuousPositionR());
     SmartDashboard.putNumber("setpoint", differentialPIDControllerL.getPositionError());

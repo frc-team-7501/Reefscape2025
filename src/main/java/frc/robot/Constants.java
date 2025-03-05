@@ -39,6 +39,7 @@ public final class Constants {
     public static final class ControllerMapping {
         public static final int XBOX = 0;
         public static final int XBOX2 = 1;
+        public static final int BBOARD = 2;
     }
 
     public static final class FunnelMapping {
@@ -63,7 +64,29 @@ public final class Constants {
         public static final double TURBO_MULTIPLIER = 1;
         public static final double PHOTON_AREA_GOAL = 19;
         public static final double xConversionInches = 39.2 / 77; // 39.2 units / 77 inches
-        public static final double yConversionInches = -39.47 / 78; // negate so left is negative, right is positive
+        public static final double yConversionInches = 39.47 / 78; // negate so left is negative, right is positive
+    }
+
+    public static final class ButtonBoardMapping {
+        public static final int BB_TRANSFER = 1;
+        public static final int BB_REEF1 = 2;
+        public static final int BB_REEF2 = 3;
+        public static final int BB_REEF3 = 4;
+        public static final int BB_REEF4 = 5;
+        public static final int BB_ALGAEL = 6;
+        public static final int BB_ALGAEU = 7;
+        public static final int BB_PROCESSOR = 8;
+        public static final int BB_LEFTALIGN = 9;
+        public static final int BB_RIGHTALIGN = 10;
+        public static final int BB_REEF_POS_60 = 15;
+        public static final int BB_REEF_POS_120 = 16;
+        public static final int BB_REEF_POS_180 = 11;
+        public static final int BB_REEF_POS_240 = 12;
+        public static final int BB_REEF_POS_300 = 13;
+        public static final int BB_REEF_POS_0_360 = 14;
+        public static final int BB_CLIMB_ARMED = 17;
+        public static final int BB_CLIMBUP = 18;
+        public static final int BB_CLIMBDOWN = 19;
     }
 
     public static final class TalonMapping {

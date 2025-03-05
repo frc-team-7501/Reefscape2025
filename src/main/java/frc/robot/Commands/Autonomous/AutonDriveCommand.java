@@ -17,10 +17,10 @@ public class AutonDriveCommand extends Command {
     private final PIDController angleController;
     private final Pose2d targetPose2d;
     private static final double DriveSpeed = 12; // inches per second, max value of 220
-    private static final double DriveAcceleration = 15; // *should be in inches/s
+    private static final double DriveAcceleration = 45; // *should be in inches/s
 
-    private static final double DriveP = 0.02;
-    private static final double DriveI = 0.001;
+    private static final double DriveP = 0.04;
+    private static final double DriveI = 0.0;
     private static final double DriveD = 0.0;
 
     // trapezoidal PID controller for X position control
@@ -34,7 +34,7 @@ public class AutonDriveCommand extends Command {
 
                       //X_PID_Controller.trapezoidal.Constraints(DriveSpeed, DriveAcceleration);
 
-    // trapezoidal PID controller for X position control
+    // trapezoidal PID controller for Y position control
     private final ProfiledPIDController Y_PID_Controller = new ProfiledPIDController(
             DriveP,
             DriveI,
@@ -59,8 +59,8 @@ public class AutonDriveCommand extends Command {
     @Override
     public void initialize() {
 
-        X_PID_Controller.setGoal(targetPose2d.getX() * MiscMapping.xConversionInches);
-        Y_PID_Controller.setGoal(targetPose2d.getY() * MiscMapping.xConversionInches);
+        X_PID_Controller.setGoal(targetPose2d.getX());
+        Y_PID_Controller.setGoal(targetPose2d.getY());
         X_PID_Controller.setTolerance(3);
         Y_PID_Controller.setTolerance(3);
         // yController.setSetpoint(targetPose2d.getY() * MiscMapping.yConversionInches);
@@ -92,9 +92,9 @@ public class AutonDriveCommand extends Command {
         double outputT = angleController.calculate(currentPose.getRotation().getRadians());
         // double outputT = 0;
 
-        SmartDashboard.putNumber("outputX1", outputX);
-        SmartDashboard.putNumber("outputY1", outputY);
-        SmartDashboard.putNumber("outputT1", outputT);
+        // SmartDashboard.putNumber("outputX1", outputX);
+        // SmartDashboard.putNumber("outputY1", outputY);
+        // SmartDashboard.putNumber("outputT1", outputT);
         SmartDashboard.putNumber("Xpos", currentPose.getX() / MiscMapping.xConversionInches);
         SmartDashboard.putNumber("Ypos", currentPose.getY() / MiscMapping.yConversionInches);
         SmartDashboard.putNumber("Tpos", currentPose.getRotation().getRadians());
