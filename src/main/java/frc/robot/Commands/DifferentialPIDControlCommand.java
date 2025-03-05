@@ -57,8 +57,8 @@ public class DifferentialPIDControlCommand extends Command {
         differentialPositionL = 0.44;
       } else if (diffLevel == 4) {
         // set differential for level four
-        differentialPositionR = 0.44;
-        differentialPositionL = 0.44;
+        differentialPositionR = 0.45;
+        differentialPositionL = 0.45;
       } else if (diffLevel == 11) {
         // set differential for Algae UPPER Level
         differentialPositionR = 0.10;
@@ -67,6 +67,10 @@ public class DifferentialPIDControlCommand extends Command {
         // set differential for Algae LOWER Level
         differentialPositionR = 0.42;
         differentialPositionL = 0.42;
+      } else if (diffLevel == 13) {
+        // set differential for Autonomous Trough
+        differentialPositionR = 0.02;
+        differentialPositionL = 0.28;
       } else {
         // set differential for else
         differentialPositionR = 0.13;
