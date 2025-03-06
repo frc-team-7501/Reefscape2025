@@ -65,15 +65,15 @@ public class RobotContainer {
 
 	// #region DefaultAuton - DO NOT USE, NOT TESTED
 	private final Command DefaultAuton = new SequentialCommandGroup(
-			new InstantCommand(
-					() -> driveTrain.resetOdometry(new Pose2d(0, 0, new Rotation2d(180))),
-					driveTrain),
-			new AutonDriveCommand(driveTrain, new Pose2d(24, 24, new Rotation2d(180)))
+			// new InstantCommand(
+			// 		() -> driveTrain.resetOdometry(new Pose2d(0, 0, new Rotation2d(180))),
+			// 		driveTrain),
+			// new AutonDriveCommand(driveTrain, new Pose2d(24, 24, new Rotation2d(180)))
 			// new ParallelRaceGroup(
 			// 		new AutonAutoAlignCommand(driveTrain, sensors),
 			// 		new WaitCommand(2))
 
-			/*
+			
 			// Moves Funnel, Differential, and Elevator to the highest Reef Level.
 			new ParallelDeadlineGroup(new WaitCommand(2),
 				new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
@@ -91,7 +91,7 @@ public class RobotContainer {
 				new SetDifferentialLevelInstantCommand(sensors, 0),
 				new ElevatorPIDControlCommand(elevator, sensors),
 				new DifferentialPIDControlCommand(differential, sensors, 2))
-			 */
+			 
 			
 	// new AutonDriveCommand(driveTrain, new Pose2d(-24, -134, new Rotation2d(0))),
 	// new AutonDriveCommand(driveTrain, new Pose2d(-35, -134, new Rotation2d(0)))
