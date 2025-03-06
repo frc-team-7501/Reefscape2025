@@ -117,20 +117,18 @@ public class Drivetrain extends SubsystemBase {
    * @param photonYaw     If apriltag 5 or 6 is seen send the yaw
    */
   public void drive(double forward, double strafe, double rotate, boolean fieldRelative, double speedMultiplier,
-      double pixySensorEncoder, double photonYaw, double photonArea) {
+      double pixySensorEncoder, double[] photonPositions) {
     SwerveModuleState[] swerveModuleStates;
     double ySpeed;
     double xSpeed;
-    final double rotationOutput = rotate;
-   
+    double zSpeed;
     
     // Get the y speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-
     if (fieldRelative) {
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forward, 0.02)) * speedMultiplier;
      } else {
-      final double forwardOutput = forward - (clampOutput(photonArea * 0.01, 0.4));
+      final double forwardOutput = forward + (clampOutput(photonPositions[MiscMapping.VISX] * 1, 0.4));
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.01)) * speedMultiplier;
      }
 
@@ -140,45 +138,40 @@ public class Drivetrain extends SubsystemBase {
      if (fieldRelative) {
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafe, 0.02)) * speedMultiplier;
      } else {
-      final double strafeOutput = strafe - (clampOutput(photonYaw * 0.01, 0.4));
+      final double strafeOutput = strafe - (clampOutput(photonPositions[MiscMapping.VISY] * 1, 0.4));
       SmartDashboard.putNumber("strafe",strafeOutput);
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafeOutput, 0.01)) * speedMultiplier;
      }
+
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    final var rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+    if (fieldRelative) {
+      zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotate, 0.02)) * Drivetrain.kMaxAngularSpeed;
+     } else {
+      final double rotationOutput = rotate - (clampOutput(photonPositions[MiscMapping.VISZ] * 0.5, 0.8));
+      SmartDashboard.putNumber("rotation", rotationOutput);
+
+      zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+     }
 
     SmartDashboard.putNumber("xSpeed", xSpeed);
     SmartDashboard.putNumber("ySpeed", ySpeed);
-    // SmartDashboard.putNumber("rotation", rot);
-    // SmartDashboard.putNumber("back left position", m_backRight.showRotation() %
-    // (Math.PI * 2));
-    // SmartDashboard.putNumber("back left turn output",
-    // m_backRight.showTurnPower());
     SmartDashboard.putNumber("Pigeon Yaw", getGyroYaw());
-    // SmartDashboard.putNumber("Pixy Output", rotationOutput);
 
+    // xSpeed = 0.0;
+    // ySpeed = 0.0;
     if (fieldRelative) {
       swerveModuleStates = Constants.DriveTrain.KINEMATICS.toSwerveModuleStates(
-          ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getGyroYaw2d()));
+          ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, zSpeed, getGyroYaw2d()));
     } else {
       swerveModuleStates = Constants.DriveTrain.KINEMATICS.toSwerveModuleStates(
-          new ChassisSpeeds(xSpeed, ySpeed, rot));
+          new ChassisSpeeds(xSpeed, ySpeed, zSpeed));
     }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
-
-    // SmartDashboard.putString("desired state", swerveModuleStates[3].toString());
-
     setModuleStates(swerveModuleStates);
-    // m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    // m_frontRight.setDesiredState(swerveModuleStates[1]);
-    // m_backLeft.setDesiredState(swerveModuleStates[2]);
-    // m_backRight.setDesiredState(swerveModuleStates[3]);
-
-    // updateOdometry();
   }
 
   public void stop() {

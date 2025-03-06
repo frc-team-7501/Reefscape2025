@@ -4,6 +4,7 @@
 
 package frc.robot.Subsystems;
 
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,13 +21,12 @@ public class Sensors extends SubsystemBase {
   private boolean isFieldCentric;
   private double speedMultiplier;
   private static Sensors instance;
-  private PhotonCamera photonCamera = new PhotonCamera("reefCam"); 
+  private PhotonCamera photonCamera = new PhotonCamera("reefCam");
   private int targetID;
   private PhotonTrackedTarget target;
   private double photonYaw;
   private double photonArea;
   private int diffLevel;
-
 
   public Sensors() {
     // Set the default delivery method to Launcher.
@@ -51,7 +51,7 @@ public class Sensors extends SubsystemBase {
   }
 
   public int getDifferentialLevel() {
-    return diffLevel; 
+    return diffLevel;
   }
 
   public boolean getIntakeSensor() {
@@ -78,46 +78,31 @@ public class Sensors extends SubsystemBase {
     speedMultiplier = multiplier;
   }
 
-  public double getPhotonVisionYaw() {
+  public double[] getReefPosition() {
     var result = photonCamera.getLatestResult();
+    target = result.getBestTarget();
+    // Defaults values to zero
+    double[] photonPositions = { 0.0, 0.0, 0.0, 0.0 };
+    // If it sees a target
     if (result.hasTargets()) {
-      // Sees a target
-      target = result.getBestTarget();
       targetID = target.getFiducialId();
-      SmartDashboard.putNumber("photonYaw", target.getYaw());
+      Transform3d cameraToTarget = target.getBestCameraToTarget();
       if ((targetID >= 6 && targetID <= 11) || (targetID >= 17 && targetID <= 22)) {
-        photonYaw = target.getYaw();
-        return photonYaw;
-      } else {
-        return 0.0;
+        photonPositions[MiscMapping.VISX] = cameraToTarget.getTranslation().getX();
+        photonPositions[MiscMapping.VISY] = cameraToTarget.getTranslation().getY();
+        // Fix the rotation values for PID commands
+        if (cameraToTarget.getRotation().getZ() * (180 / Math.PI) > 0) {
+          photonPositions[MiscMapping.VISZ] = cameraToTarget.getRotation().getZ() * (180 / Math.PI) - 180;
+        } else {
+          photonPositions[MiscMapping.VISZ] = cameraToTarget.getRotation().getZ() * (180 / Math.PI) + 180;
+        }
+        photonPositions[MiscMapping.VISFOUND] = 1.0;
       }
-    } else {
-      // Doesn't see a target
-      return 0.0;
     }
+    SmartDashboard.putNumber("photonX", photonPositions[MiscMapping.VISX]);
+    SmartDashboard.putNumber("photonY", photonPositions[MiscMapping.VISY]);
+    SmartDashboard.putNumber("photonYaw", photonPositions[MiscMapping.VISZ]);
+    SmartDashboard.putNumber("photonTarg", photonPositions[MiscMapping.VISFOUND]);
+    return photonPositions;
   }
-
-  public double getPhotonVisionArea() {
-    var result = photonCamera.getLatestResult();
-    SmartDashboard.putBoolean("hasTarget", result.hasTargets());
-    if (result.hasTargets()) {
-      // Sees a target
-      target = result.getBestTarget();
-      targetID = target.getFiducialId();
-      SmartDashboard.putNumber("targetID", targetID);
-      SmartDashboard.putNumber("photonArea", target.getArea());
-      if ((targetID >= 6 && targetID <= 11) || (targetID >= 17 && targetID <= 22)) {
-        photonArea = target.getArea();
-        return photonArea - MiscMapping.PHOTON_AREA_GOAL;
-      } else {
-        return 0.0;
-      }
-    } else {
-      // Doesn't see a target
-      return 0.0;
-    }
-  }
-
-
-  
 }

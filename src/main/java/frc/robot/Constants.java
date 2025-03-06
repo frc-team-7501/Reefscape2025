@@ -1,8 +1,17 @@
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 public final class Constants {
     public static final class CANMapping {
@@ -65,6 +74,11 @@ public final class Constants {
         public static final double PHOTON_AREA_GOAL = 19;
         public static final double xConversionInches = 39.2 / 77; // 39.2 units / 77 inches
         public static final double yConversionInches = 39.47 / 78; // negate so left is negative, right is positive
+        public static final int VISX = 0;
+        public static final int VISY = 1;
+        public static final int VISZ = 2;
+        public static final int VISFOUND = 3;
+
     }
 
     public static final class ButtonBoardMapping {

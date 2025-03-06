@@ -78,6 +78,7 @@ public class AutonDriveCommand extends Command {
 
     @Override
     public void execute() {
+        double[] photonPositions = {0.0, 0.0, 0.0, 0.0};
         Pose2d currentPose = drivetrain.getPose();
 
         double outputX = X_PID_Controller.calculate(currentPose.getX());
@@ -108,7 +109,7 @@ public class AutonDriveCommand extends Command {
         // SmartDashboard.putNumber("Clamped outputY", outputY);
         // SmartDashboard.putNumber("Clamped outputT", outputT);
 
-        drivetrain.drive(-outputX, -outputY, -outputT, true, 1, 0.5, 0, 0);
+        drivetrain.drive(-outputX, -outputY, -outputT, true, 1, 0.5, photonPositions);
     }
 
     @Override
