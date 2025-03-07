@@ -32,14 +32,12 @@ public class Funnel extends SubsystemBase {
 
     // PID values
     funnelMotorConfig.closedLoop
-        .p(0.04)
+        .p(0.06)
         .i(0.0)
         .d(0.0)
         .outputRange(-0.1, 0.1);
 
         funnelMotor.configure(funnelMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    SmartDashboard.putNumber("FunPos", funnelMotor.getEncoder().getPosition());
   }
 
   public void resetEncoder() {
@@ -55,6 +53,7 @@ public class Funnel extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("FunPos", funnelMotor.getEncoder().getPosition());
   }
 
   public double getFunnelPosition() {
@@ -63,6 +62,7 @@ public class Funnel extends SubsystemBase {
 
   // Manual command
   public void moveFunnel(double speed) {
+    speed = 0;
     funnelMotor.set(speed);
   }
 

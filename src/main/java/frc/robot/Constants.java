@@ -53,7 +53,7 @@ public final class Constants {
 
     public static final class FunnelMapping {
         public static final double UPPER_FUN = 0.0;
-        public static final double LOWER_FUN = 6.0;
+        public static final double LOWER_FUN = -11.3;
     }
 
     public static final class DIOMapping {
