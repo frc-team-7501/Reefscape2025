@@ -31,6 +31,7 @@ import frc.robot.Commands.ResetElevatorEncodersInstantCommand;
 import frc.robot.Commands.ResetGyroYawInstantCommand;
 import frc.robot.Commands.SetDifferentialLevelInstantCommand;
 import frc.robot.Commands.SetIsFieldCentricInstantCommand;
+import frc.robot.Commands.SetLRCSelectorInstantCommand;
 import frc.robot.Commands.SetSpeedMultiplierInstantCommand;
 import frc.robot.Commands.SwerveDriveManualCommand;
 import frc.robot.Commands.Autonomous.AutonAutoAlignCommand;
@@ -151,6 +152,12 @@ public class RobotContainer {
 		m_Xbox.b_RightBumper()
 				.onFalse(new IntakeControlCommand(intake, sensors, 0.0, true));
 
+		// Field Centric Toggle
+		m_Xbox.b_LeftBumper()
+				.onTrue(new SetIsFieldCentricInstantCommand(sensors, false));
+		m_Xbox.b_LeftBumper()
+				.onFalse(new SetIsFieldCentricInstantCommand(sensors, true));
+
 		// Funnel positions
 		m_Xbox.b_X()
 				.onTrue(new FunnelPIDControlCommand(funnel, FunnelMapping.UPPER_FUN));
@@ -217,36 +224,12 @@ public class RobotContainer {
 								new DifferentialPIDControlCommand(differential, sensors,
 										2))));
 
-		// Field Centric Toggle
-		m_Xbox.b_LeftBumper()
-				.onTrue(new SetIsFieldCentricInstantCommand(sensors, false));
-		m_Xbox.b_LeftBumper()
-				.onFalse(new SetIsFieldCentricInstantCommand(sensors, true));
-
 		// Reef scoring selection
 		new JoystickButton(m_board, ButtonBoardMapping.BB_RIGHTALIGN)
-				.onTrue(new ParallelCommandGroup(
-						new IntakeControlCommand(intake, sensors, 1.0, false),
-						new ElevatorPIDControlCommand(elevator, sensors),
-						new DifferentialPIDControlCommand(differential, sensors, 1)));
-
-		new JoystickButton(m_board, ButtonBoardMapping.BB_RIGHTALIGN)
-				.onFalse(new ParallelCommandGroup(
-						new IntakeControlCommand(intake, sensors, 1.0, false),
-						new ElevatorPIDControlCommand(elevator, sensors),
-						new DifferentialPIDControlCommand(differential, sensors, 2)));
+				.onTrue(new SetLRCSelectorInstantCommand(sensors, 1));
 
 		new JoystickButton(m_board, ButtonBoardMapping.BB_LEFTALIGN)
-				.onTrue(new ParallelCommandGroup(
-						new IntakeControlCommand(intake, sensors, 1.0, false),
-						new ElevatorPIDControlCommand(elevator, sensors),
-						new DifferentialPIDControlCommand(differential, sensors, 0)));
-
-		new JoystickButton(m_board, ButtonBoardMapping.BB_LEFTALIGN)
-				.onFalse(new ParallelCommandGroup(
-						new IntakeControlCommand(intake, sensors, 1.0, false),
-						new ElevatorPIDControlCommand(elevator, sensors),
-						new DifferentialPIDControlCommand(differential, sensors, 2)));
+				.onTrue(new SetLRCSelectorInstantCommand(sensors, 0));
 	}
 	// #endregion
 

@@ -27,6 +27,7 @@ public class Sensors extends SubsystemBase {
   private double photonYaw;
   private double photonArea;
   private int diffLevel;
+  private int LRC;
 
   public Sensors() {
     // Set the default delivery method to Launcher.
@@ -52,6 +53,14 @@ public class Sensors extends SubsystemBase {
 
   public int getDifferentialLevel() {
     return diffLevel;
+  }
+
+  public void setLRCSelector(int LRC) {
+    this.LRC = LRC;
+  }
+
+  public int getLRCSelector() {
+    return LRC;
   }
 
   public boolean getIntakeSensor() {

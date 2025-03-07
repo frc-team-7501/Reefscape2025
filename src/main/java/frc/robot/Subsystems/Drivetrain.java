@@ -117,18 +117,25 @@ public class Drivetrain extends SubsystemBase {
    * @param photonYaw     If apriltag 5 or 6 is seen send the yaw
    */
   public void drive(double forward, double strafe, double rotate, boolean fieldRelative, double speedMultiplier,
-      double pixySensorEncoder, double[] photonPositions) {
+      double pixySensorEncoder, double[] photonPositions, int LRC) {
     SwerveModuleState[] swerveModuleStates;
     double ySpeed;
     double xSpeed;
     double zSpeed;
+    double yVisOffset;
+
+    if (LRC == 0) {
+      yVisOffset = -0.15;
+    } else {
+      yVisOffset = 0.15;
+    }
     
     // Get the y speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
     if (fieldRelative) {
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forward, 0.02)) * speedMultiplier;
      } else {
-      final double forwardOutput = forward + (clampOutput(photonPositions[MiscMapping.VISX] * 1, 0.4));
+      final double forwardOutput = forward - (clampOutput((0.43 - photonPositions[MiscMapping.VISX]) * 1, 0.2));
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.01)) * speedMultiplier;
      }
 
@@ -138,7 +145,7 @@ public class Drivetrain extends SubsystemBase {
      if (fieldRelative) {
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafe, 0.02)) * speedMultiplier;
      } else {
-      final double strafeOutput = strafe - (clampOutput(photonPositions[MiscMapping.VISY] * 1, 0.4));
+      final double strafeOutput = strafe - (clampOutput((yVisOffset - photonPositions[MiscMapping.VISY]) * 1, 0.4));
       SmartDashboard.putNumber("strafe",strafeOutput);
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafeOutput, 0.01)) * speedMultiplier;
      }
@@ -150,7 +157,7 @@ public class Drivetrain extends SubsystemBase {
     if (fieldRelative) {
       zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotate, 0.02)) * Drivetrain.kMaxAngularSpeed;
      } else {
-      final double rotationOutput = rotate - (clampOutput(photonPositions[MiscMapping.VISZ] * 0.5, 0.8));
+      final double rotationOutput = rotate - (clampOutput(photonPositions[MiscMapping.VISZ] * 0.04, 0.4));
       SmartDashboard.putNumber("rotation", rotationOutput);
 
       zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
@@ -160,8 +167,9 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("ySpeed", ySpeed);
     SmartDashboard.putNumber("Pigeon Yaw", getGyroYaw());
 
-    // xSpeed = 0.0;
+    xSpeed = 0.0;
     // ySpeed = 0.0;
+    // zSpeed = 0.0;
     if (fieldRelative) {
       swerveModuleStates = Constants.DriveTrain.KINEMATICS.toSwerveModuleStates(
           ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, zSpeed, getGyroYaw2d()));

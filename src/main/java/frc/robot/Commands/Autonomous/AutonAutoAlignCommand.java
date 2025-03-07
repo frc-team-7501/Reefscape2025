@@ -26,7 +26,7 @@ public class AutonAutoAlignCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drivetrain.drive(0, 0, 0, false, 1, 0.5, sensors.getReefPosition());
+    drivetrain.drive(0, 0, 0, false, 1, 0.5, sensors.getReefPosition(), 0);
   }
 
   // Called once the command ends or is interrupted.
