@@ -4,6 +4,7 @@
 
 package frc.robot.Commands.Autonomous;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Sensors;
@@ -13,7 +14,7 @@ public class AutonAutoAlignCommand extends Command {
   public final Drivetrain drivetrain;
   public final Sensors sensors;
   /** Creates a new AutonAutoAlignCommand. */
-  public AutonAutoAlignCommand(final Drivetrain drivetrain, final Sensors sensors) {
+  public AutonAutoAlignCommand(final Drivetrain drivetrain, final Sensors sensors, XboxController m_Xbox) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drivetrain = drivetrain;
     this.sensors = sensors;

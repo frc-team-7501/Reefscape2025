@@ -4,10 +4,13 @@
 
 package frc.robot.Subsystems;
 
+import java.lang.ProcessBuilder.Redirect.Type;
+
 //import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.sensors.PigeonIMU; 
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,6 +19,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -116,6 +121,11 @@ public class Drivetrain extends SubsystemBase {
    *                      field.
    * @param photonYaw     If apriltag 5 or 6 is seen send the yaw
    */
+
+  private final PIDController xSpeedPIDController = new PIDController(0.6, 0.5, 0.02);
+  private final PIDController ySpeedPIDController = new PIDController(0.6, 0.75, 0.02);
+  private final PIDController zSpeedPIDController = new PIDController(0.02, 0.03, 0.06);
+
   public void drive(double forward, double strafe, double rotate, boolean fieldRelative, double speedMultiplier,
       double pixySensorEncoder, double[] photonPositions, int LRC) {
     SwerveModuleState[] swerveModuleStates;
@@ -124,18 +134,23 @@ public class Drivetrain extends SubsystemBase {
     double zSpeed;
     double yVisOffset;
 
+    xSpeedPIDController.setIntegratorRange(-0.2, 0.2);
+    xSpeedPIDController.setIZone(0.1);
+    ySpeedPIDController.setIntegratorRange(-0.2, 0.2);
+    ySpeedPIDController.setIZone(0.1);
+    zSpeedPIDController.setIntegratorRange(-0.1, 0.1);
+    
     if (LRC == 0) {
       yVisOffset = -0.15;
     } else {
       yVisOffset = 0.15;
     }
-    
     // Get the y speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
     if (fieldRelative) {
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forward, 0.02)) * speedMultiplier;
      } else {
-      final double forwardOutput = forward - (clampOutput((0.43 - photonPositions[MiscMapping.VISX]) * 1, 0.2));
+      final double forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.5), 0.4));
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.01)) * speedMultiplier;
      }
 
@@ -145,8 +160,9 @@ public class Drivetrain extends SubsystemBase {
      if (fieldRelative) {
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafe, 0.02)) * speedMultiplier;
      } else {
-      final double strafeOutput = strafe - (clampOutput((yVisOffset - photonPositions[MiscMapping.VISY]) * 1, 0.4));
+      final double strafeOutput = -(clampOutput(ySpeedPIDController.calculate(photonPositions[MiscMapping.VISY], yVisOffset), 0.4));
       SmartDashboard.putNumber("strafe",strafeOutput);
+      SmartDashboard.putNumber("yvisoffset", yVisOffset);
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafeOutput, 0.01)) * speedMultiplier;
      }
 
@@ -157,17 +173,27 @@ public class Drivetrain extends SubsystemBase {
     if (fieldRelative) {
       zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotate, 0.02)) * Drivetrain.kMaxAngularSpeed;
      } else {
-      final double rotationOutput = rotate - (clampOutput(photonPositions[MiscMapping.VISZ] * 0.04, 0.4));
+      double rotationOutput = (clampOutput(zSpeedPIDController.calculate(photonPositions[MiscMapping.VISZ]), 0.5));
       SmartDashboard.putNumber("rotation", rotationOutput);
-
+      SmartDashboard.putNumber("zError", zSpeedPIDController.getError());
+      if (Math.abs(zSpeedPIDController.getError()) < 1) {
+        rotationOutput = 0.0;
+      }
       zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
      }
 
+    //  if (Math.abs(xSpeedPIDController.getError()) < 1 && Math.abs(ySpeedPIDController.getError()) < 1 && Math.abs(zSpeedPIDController.getError()) < 1) {
+    //   m_Xbox.setRumble(RumbleType.kBothRumble, 1.0);
+    //  } else {
+    //   m_Xbox.setRumble(RumbleType.kBothRumble, 0.0);
+    //  }
+
     SmartDashboard.putNumber("xSpeed", xSpeed);
     SmartDashboard.putNumber("ySpeed", ySpeed);
+    SmartDashboard.putNumber("zSpeed", zSpeed);
     SmartDashboard.putNumber("Pigeon Yaw", getGyroYaw());
 
-    xSpeed = 0.0;
+    // xSpeed = 0.0;
     // ySpeed = 0.0;
     // zSpeed = 0.0;
     if (fieldRelative) {

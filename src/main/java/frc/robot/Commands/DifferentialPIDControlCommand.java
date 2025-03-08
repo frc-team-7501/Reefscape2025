@@ -52,12 +52,12 @@ public class DifferentialPIDControlCommand extends Command {
       differentialPositionL = 0.29;
     } else if (diffLevel == 3) {
       // set differential for level three
-      differentialPositionR = 0.44;
-      differentialPositionL = 0.44;
+      differentialPositionR = 0.48;
+      differentialPositionL = 0.48;
     } else if (diffLevel == 4) {
       // set differential for level four
-      differentialPositionR = 0.45;
-      differentialPositionL = 0.45;
+      differentialPositionR = 0.48;
+      differentialPositionL = 0.48;
     } else if (diffLevel == 11) {
       // set differential for Algae UPPER Level
       differentialPositionR = 0.10;

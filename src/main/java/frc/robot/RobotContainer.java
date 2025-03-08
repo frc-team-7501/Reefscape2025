@@ -148,9 +148,16 @@ public class RobotContainer {
 
 		// Output
 		m_Xbox.b_RightBumper()
-				.onTrue(new IntakeControlCommand(intake, sensors, 1.0, true));
+				.onTrue(new ParallelCommandGroup(
+				new IntakeControlCommand(intake, sensors, 1.0, true),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors, 2)));
+
 		m_Xbox.b_RightBumper()
-				.onFalse(new IntakeControlCommand(intake, sensors, 0.0, true));
+				.onFalse(new ParallelCommandGroup(
+					new IntakeControlCommand(intake, sensors, 0.0, true),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors, 2)));
 
 		// Field Centric Toggle
 		m_Xbox.b_LeftBumper()
