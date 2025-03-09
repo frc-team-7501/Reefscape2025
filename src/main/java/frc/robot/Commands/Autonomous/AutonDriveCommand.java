@@ -109,7 +109,7 @@ public class AutonDriveCommand extends Command {
         // SmartDashboard.putNumber("Clamped outputY", outputY);
         // SmartDashboard.putNumber("Clamped outputT", outputT);
 
-        drivetrain.drive(-outputX, -outputY, -outputT, true, 1, 0.5, photonPositions, 0);
+        drivetrain.drive(-outputX, -outputY, -outputT, true, 1, 0.5, photonPositions, 0, 0);
     }
 
     @Override

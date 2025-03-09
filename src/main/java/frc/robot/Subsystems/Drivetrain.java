@@ -7,7 +7,8 @@ package frc.robot.Subsystems;
 import java.lang.ProcessBuilder.Redirect.Type;
 
 //import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.sensors.PigeonIMU; 
+import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.PigeonImuJNI;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -125,9 +126,11 @@ public class Drivetrain extends SubsystemBase {
   private final PIDController xSpeedPIDController = new PIDController(0.6, 0.5, 0.02);
   private final PIDController ySpeedPIDController = new PIDController(0.6, 0.75, 0.02);
   private final PIDController zSpeedPIDController = new PIDController(0.02, 0.03, 0.06);
+  private final PIDController zRotationPIDController = new PIDController(0.1, 0.0, 0.0);
+
 
   public void drive(double forward, double strafe, double rotate, boolean fieldRelative, double speedMultiplier,
-      double pixySensorEncoder, double[] photonPositions, int LRC) {
+      double pixySensorEncoder, double[] photonPositions, int LRC, int reefRotation) {
     SwerveModuleState[] swerveModuleStates;
     double ySpeed;
     double xSpeed;
@@ -139,7 +142,9 @@ public class Drivetrain extends SubsystemBase {
     ySpeedPIDController.setIntegratorRange(-0.2, 0.2);
     ySpeedPIDController.setIZone(0.1);
     zSpeedPIDController.setIntegratorRange(-0.1, 0.1);
-    
+    zRotationPIDController.setIntegratorRange(-0.1, 0.1);
+    zRotationPIDController.enableContinuousInput(-180, 180);
+
     if (LRC == 0) {
       yVisOffset = -0.15;
     } else {
@@ -161,8 +166,8 @@ public class Drivetrain extends SubsystemBase {
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafe, 0.02)) * speedMultiplier;
      } else {
       final double strafeOutput = -(clampOutput(ySpeedPIDController.calculate(photonPositions[MiscMapping.VISY], yVisOffset), 0.4));
-      SmartDashboard.putNumber("strafe",strafeOutput);
-      SmartDashboard.putNumber("yvisoffset", yVisOffset);
+      // SmartDashboard.putNumber("strafe",strafeOutput);
+      // SmartDashboard.putNumber("yvisoffset", yVisOffset);
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafeOutput, 0.01)) * speedMultiplier;
      }
 
@@ -171,27 +176,45 @@ public class Drivetrain extends SubsystemBase {
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
     if (fieldRelative) {
-      zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotate, 0.02)) * Drivetrain.kMaxAngularSpeed;
+      if (reefRotation == 1) {
+        double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 0), 0.75));
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+      } else if (reefRotation == 2) {
+        double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 300), 0.75));
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+      } else if (reefRotation == 3) {
+        double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 240), 0.75));
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+      } else if (reefRotation == 4) {
+        double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 180), 0.75));
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+      } else if (reefRotation == 5) {
+        double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 120), 0.75));
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+      } else if (reefRotation == 6) {
+        double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 60), 0.75));
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+      } else {
+        zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotate, 0.02)) * Drivetrain.kMaxAngularSpeed;
+      }
+      
      } else {
       double rotationOutput = (clampOutput(zSpeedPIDController.calculate(photonPositions[MiscMapping.VISZ]), 0.5));
-      SmartDashboard.putNumber("rotation", rotationOutput);
-      SmartDashboard.putNumber("zError", zSpeedPIDController.getError());
+      // SmartDashboard.putNumber("rotation", rotationOutput);
+      // SmartDashboard.putNumber("zError", zSpeedPIDController.getError());
       if (Math.abs(zSpeedPIDController.getError()) < 1) {
         rotationOutput = 0.0;
       }
       zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
      }
 
-    //  if (Math.abs(xSpeedPIDController.getError()) < 1 && Math.abs(ySpeedPIDController.getError()) < 1 && Math.abs(zSpeedPIDController.getError()) < 1) {
-    //   m_Xbox.setRumble(RumbleType.kBothRumble, 1.0);
-    //  } else {
-    //   m_Xbox.setRumble(RumbleType.kBothRumble, 0.0);
-    //  }
-
-    SmartDashboard.putNumber("xSpeed", xSpeed);
-    SmartDashboard.putNumber("ySpeed", ySpeed);
-    SmartDashboard.putNumber("zSpeed", zSpeed);
+    // SmartDashboard.putNumber("xSpeed", xSpeed);
+    // SmartDashboard.putNumber("ySpeed", ySpeed);
+    // SmartDashboard.putNumber("zSpeed", zSpeed);
     SmartDashboard.putNumber("Pigeon Yaw", getGyroYaw());
+    SmartDashboard.putNumber("ReefRot", reefRotation);
+    SmartDashboard.putNumber("VISZ", photonPositions[MiscMapping.VISZ]);
+
 
     // xSpeed = 0.0;
     // ySpeed = 0.0;
@@ -224,7 +247,7 @@ public class Drivetrain extends SubsystemBase {
     updateOdometry();
   }
 
-  public void resetOdometry(Pose2d pose) {
+  public void resetPose(Pose2d pose) {
     m_odometry.resetPosition(
         getGyroYaw2d(),
         new SwerveModulePosition[] {

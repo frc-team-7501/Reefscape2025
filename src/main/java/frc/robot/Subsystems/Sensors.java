@@ -27,6 +27,7 @@ public class Sensors extends SubsystemBase {
   private double photonYaw;
   private double photonArea;
   private int diffLevel;
+  private int reefRotation = 0;
   private int LRC;
 
   public Sensors() {
@@ -45,6 +46,14 @@ public class Sensors extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("climbSen", climbSensor.get());
+  }
+
+  public void setReefRotation(int reefRotation) {
+    this.reefRotation = reefRotation;
+  }
+
+  public int getReefRotation () {
+    return reefRotation;
   }
 
   public void setDifferentialLevel(int diffLevelin) {

@@ -32,6 +32,7 @@ import frc.robot.Commands.ResetGyroYawInstantCommand;
 import frc.robot.Commands.SetDifferentialLevelInstantCommand;
 import frc.robot.Commands.SetIsFieldCentricInstantCommand;
 import frc.robot.Commands.SetLRCSelectorInstantCommand;
+import frc.robot.Commands.SetReefRotationInstantCommand;
 import frc.robot.Commands.SetSpeedMultiplierInstantCommand;
 import frc.robot.Commands.SwerveDriveManualCommand;
 import frc.robot.Commands.Autonomous.AutonAutoAlignCommand;
@@ -66,34 +67,65 @@ public class RobotContainer {
 
 	// #region DefaultAuton - DO NOT USE, NOT TESTED
 	private final Command DefaultAuton = new SequentialCommandGroup(
-			// new InstantCommand(
-			// 		() -> driveTrain.resetOdometry(new Pose2d(0, 0, new Rotation2d(180))),
-			// 		driveTrain),
-			// new AutonDriveCommand(driveTrain, new Pose2d(24, 24, new Rotation2d(180)))
-			// new ParallelRaceGroup(
-			// 		new AutonAutoAlignCommand(driveTrain, sensors),
-			// 		new WaitCommand(2))
+			new InstantCommand(
+					() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d(180))),
+					driveTrain),
 
-			
-			// Moves Funnel, Differential, and Elevator to the highest Reef Level.
-			new ParallelDeadlineGroup(new WaitCommand(2),
-				new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
-				new SetDifferentialLevelInstantCommand(sensors, 4),
-				new ElevatorPIDControlCommand(elevator, sensors),
-				new DifferentialPIDControlCommand(differential, sensors, 2)),
+			// Moves Funnel, Differential, and Elevator to the highest Reef Level
+			new ParallelDeadlineGroup(new WaitCommand(1),
+					new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+					new SetDifferentialLevelInstantCommand(sensors, 4),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors, 2)),
 
-			// Outputs the Coral onto the Reef for half a second. 
+			new SetLRCSelectorInstantCommand(sensors, 1),
+			new SetIsFieldCentricInstantCommand(sensors, false),
+
+			// Auto Align using Vision to April Tags
+			new ParallelDeadlineGroup(new WaitCommand(5),
+					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+							() -> false),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors, 2)),
+
+			// Outputs the Coral onto the Reef for half a second
 			new ParallelDeadlineGroup(new WaitCommand(0.5),
-				new IntakeControlCommand(intake, sensors, 1.0, true)),
+					new IntakeControlCommand(intake, sensors, 1.0, true),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors, 2)),
 
-			// Return scoring elements to home position
+			// Backup
+			new ParallelDeadlineGroup(new WaitCommand(0.5),
+					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.25, () -> 0.0, () -> 0.0, () -> 0.0,
+							() -> true),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors, 2)),
+
+			// Stop moving and retract scoring elements to home position
 			new ParallelDeadlineGroup(new WaitCommand(2),
-				new IntakeControlCommand(intake, sensors, -1.0, false),
-				new SetDifferentialLevelInstantCommand(sensors, 0),
-				new ElevatorPIDControlCommand(elevator, sensors),
-				new DifferentialPIDControlCommand(differential, sensors, 2))
-			 
-			
+					new SetDifferentialLevelInstantCommand(sensors, 0),
+					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+							() -> true),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors, 2)),
+
+			new SetIsFieldCentricInstantCommand(sensors, true)
+
+	// // Rotate 180 degrees
+	// new ResetGyroYawInstantCommand(driveTrain),
+	// new AutonDriveCommand(driveTrain, new Pose2d(0, 0, new Rotation2d((0))),
+
+	// // Stop moving again
+	// new SwerveDriveManualCommand(driveTrain, sensors, ()-> 0.0, ()-> 0.0, ()->
+	// 0.0, ()-> 0.0, ()-> true)
+
+	// // Return scoring elements to home position
+	// new ParallelDeadlineGroup(new WaitCommand(2),
+	// new IntakeControlCommand(intake, sensors, -1.0, false),
+	// new SetDifferentialLevelInstantCommand(sensors, 0),
+	// new ElevatorPIDControlCommand(elevator, sensors),
+	// new DifferentialPIDControlCommand(differential, sensors, 2))
+
 	// new AutonDriveCommand(driveTrain, new Pose2d(-24, -134, new Rotation2d(0))),
 	// new AutonDriveCommand(driveTrain, new Pose2d(-35, -134, new Rotation2d(0)))
 	);
@@ -149,15 +181,15 @@ public class RobotContainer {
 		// Output
 		m_Xbox.b_RightBumper()
 				.onTrue(new ParallelCommandGroup(
-				new IntakeControlCommand(intake, sensors, 1.0, true),
-				new ElevatorPIDControlCommand(elevator, sensors),
-				new DifferentialPIDControlCommand(differential, sensors, 2)));
+						new IntakeControlCommand(intake, sensors, 1.0, true),
+						new ElevatorPIDControlCommand(elevator, sensors),
+						new DifferentialPIDControlCommand(differential, sensors, 2)));
 
 		m_Xbox.b_RightBumper()
 				.onFalse(new ParallelCommandGroup(
-					new IntakeControlCommand(intake, sensors, 0.0, true),
-					new ElevatorPIDControlCommand(elevator, sensors),
-					new DifferentialPIDControlCommand(differential, sensors, 2)));
+						new IntakeControlCommand(intake, sensors, 0.0, true),
+						new ElevatorPIDControlCommand(elevator, sensors),
+						new DifferentialPIDControlCommand(differential, sensors, 2)));
 
 		// Field Centric Toggle
 		m_Xbox.b_LeftBumper()
@@ -173,7 +205,6 @@ public class RobotContainer {
 				.onTrue(new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN));
 
 		// Elevator setpoints
-
 		new JoystickButton(m_board, ButtonBoardMapping.BB_TRANSFER)
 				.onTrue(new ParallelCommandGroup(
 						new IntakeControlCommand(intake, sensors, -1.0, false),
@@ -217,6 +248,7 @@ public class RobotContainer {
 								new SetDifferentialLevelInstantCommand(sensors, 10),
 								new ElevatorPIDControlCommand(elevator, sensors),
 								new DifferentialPIDControlCommand(differential, sensors, 2))));
+
 		new JoystickButton(m_board, ButtonBoardMapping.BB_ALGAEU)
 				.onTrue(new SequentialCommandGroup(
 						new SetDifferentialLevelInstantCommand(sensors, 11),
@@ -231,10 +263,35 @@ public class RobotContainer {
 								new DifferentialPIDControlCommand(differential, sensors,
 										2))));
 
+		// Reef Rotation
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS1)
+				.onTrue(new SetReefRotationInstantCommand(sensors, 1));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS1)
+				.onFalse(new SetReefRotationInstantCommand(sensors, 0));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS2)
+				.onTrue(new SetReefRotationInstantCommand(sensors, 2));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS2)
+				.onFalse(new SetReefRotationInstantCommand(sensors, 0));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS3)
+				.onTrue(new SetReefRotationInstantCommand(sensors, 3));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS3)
+				.onFalse(new SetReefRotationInstantCommand(sensors, 0));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS4)
+				.onTrue(new SetReefRotationInstantCommand(sensors, 4));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS4)
+				.onFalse(new SetReefRotationInstantCommand(sensors, 0));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS5)
+				.onTrue(new SetReefRotationInstantCommand(sensors, 5));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS5)
+				.onFalse(new SetReefRotationInstantCommand(sensors, 0));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS6)
+				.onTrue(new SetReefRotationInstantCommand(sensors, 6));
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS6)
+				.onFalse(new SetReefRotationInstantCommand(sensors, 0));
+		
 		// Reef scoring selection
 		new JoystickButton(m_board, ButtonBoardMapping.BB_RIGHTALIGN)
 				.onTrue(new SetLRCSelectorInstantCommand(sensors, 1));
-
 		new JoystickButton(m_board, ButtonBoardMapping.BB_LEFTALIGN)
 				.onTrue(new SetLRCSelectorInstantCommand(sensors, 0));
 	}
