@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.lang.ModuleLayer.Controller;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -22,9 +20,7 @@ import frc.robot.Constants.ControllerMapping;
 import frc.robot.Constants.FunnelMapping;
 import frc.robot.Constants.MiscMapping;
 import frc.robot.Commands.ClimbControlCommand;
-import frc.robot.Commands.DifferentialControlCommand;
 import frc.robot.Commands.DifferentialPIDControlCommand;
-import frc.robot.Commands.ElevatorControlCommand;
 import frc.robot.Commands.ElevatorPIDControlCommand;
 import frc.robot.Commands.IntakeControlCommand;
 import frc.robot.Commands.ResetElevatorEncodersInstantCommand;
@@ -33,10 +29,7 @@ import frc.robot.Commands.SetDifferentialLevelInstantCommand;
 import frc.robot.Commands.SetIsFieldCentricInstantCommand;
 import frc.robot.Commands.SetLRCSelectorInstantCommand;
 import frc.robot.Commands.SetReefRotationInstantCommand;
-import frc.robot.Commands.SetSpeedMultiplierInstantCommand;
 import frc.robot.Commands.SwerveDriveManualCommand;
-import frc.robot.Commands.Autonomous.AutonAutoAlignCommand;
-import frc.robot.Commands.Autonomous.AutonDriveCommand;
 import frc.robot.Commands.FunnelControlCommand;
 import frc.robot.Commands.FunnelPIDControlCommand;
 import frc.robot.Subsystems.Drivetrain;
@@ -65,8 +58,8 @@ public class RobotContainer {
 	////////////////////////////////
 	// #region [ AUTON COMMANDS ]
 
-	// #region DefaultAuton - DO NOT USE, NOT TESTED
-	private final Command DefaultAuton = new SequentialCommandGroup(
+	// #region AutoAlignCenterL4 - DO NOT USE, NOT TESTED
+	private final Command AutoAlignCenterL4 = new SequentialCommandGroup(
 			new InstantCommand(
 					() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d(180))),
 					driveTrain),
@@ -76,7 +69,7 @@ public class RobotContainer {
 					new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
 					new SetDifferentialLevelInstantCommand(sensors, 4),
 					new ElevatorPIDControlCommand(elevator, sensors),
-					new DifferentialPIDControlCommand(differential, sensors, 2)),
+					new DifferentialPIDControlCommand(differential, sensors)),
 
 			new SetLRCSelectorInstantCommand(sensors, 1),
 			new SetIsFieldCentricInstantCommand(sensors, false),
@@ -86,20 +79,20 @@ public class RobotContainer {
 					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
 							() -> false),
 					new ElevatorPIDControlCommand(elevator, sensors),
-					new DifferentialPIDControlCommand(differential, sensors, 2)),
+					new DifferentialPIDControlCommand(differential, sensors)),
 
 			// Outputs the Coral onto the Reef for half a second
 			new ParallelDeadlineGroup(new WaitCommand(0.5),
 					new IntakeControlCommand(intake, sensors, 1.0, true),
 					new ElevatorPIDControlCommand(elevator, sensors),
-					new DifferentialPIDControlCommand(differential, sensors, 2)),
+					new DifferentialPIDControlCommand(differential, sensors)),
 
 			// Backup
 			new ParallelDeadlineGroup(new WaitCommand(0.5),
 					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.25, () -> 0.0, () -> 0.0, () -> 0.0,
 							() -> true),
 					new ElevatorPIDControlCommand(elevator, sensors),
-					new DifferentialPIDControlCommand(differential, sensors, 2)),
+					new DifferentialPIDControlCommand(differential, sensors)),
 
 			// Stop moving and retract scoring elements to home position
 			new ParallelDeadlineGroup(new WaitCommand(2),
@@ -107,7 +100,7 @@ public class RobotContainer {
 					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
 							() -> true),
 					new ElevatorPIDControlCommand(elevator, sensors),
-					new DifferentialPIDControlCommand(differential, sensors, 2)),
+					new DifferentialPIDControlCommand(differential, sensors)),
 
 			new SetIsFieldCentricInstantCommand(sensors, true)
 
@@ -132,7 +125,7 @@ public class RobotContainer {
 
 	// #endregion
 	////////////////////////////////
-
+	// #endregion
 	// Create commands
 
 	// Swerve Control
@@ -183,13 +176,13 @@ public class RobotContainer {
 				.onTrue(new ParallelCommandGroup(
 						new IntakeControlCommand(intake, sensors, 1.0, true),
 						new ElevatorPIDControlCommand(elevator, sensors),
-						new DifferentialPIDControlCommand(differential, sensors, 2)));
+						new DifferentialPIDControlCommand(differential, sensors)));
 
 		m_Xbox.b_RightBumper()
 				.onFalse(new ParallelCommandGroup(
 						new IntakeControlCommand(intake, sensors, 0.0, true),
 						new ElevatorPIDControlCommand(elevator, sensors),
-						new DifferentialPIDControlCommand(differential, sensors, 2)));
+						new DifferentialPIDControlCommand(differential, sensors)));
 
 		// Field Centric Toggle
 		m_Xbox.b_LeftBumper()
@@ -198,10 +191,10 @@ public class RobotContainer {
 				.onFalse(new SetIsFieldCentricInstantCommand(sensors, true));
 
 		// Funnel positions
-		m_Xbox.b_X()
+		new JoystickButton(m_board, ButtonBoardMapping.BB_CLIMBUP)
 				.onTrue(new FunnelPIDControlCommand(funnel, FunnelMapping.UPPER_FUN));
 
-		m_Xbox.b_Y()
+		new JoystickButton(m_board, ButtonBoardMapping.BB_CLIMBDOWN)
 				.onTrue(new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN));
 
 		// Elevator setpoints
@@ -210,34 +203,33 @@ public class RobotContainer {
 						new IntakeControlCommand(intake, sensors, -1.0, false),
 						new SetDifferentialLevelInstantCommand(sensors, 0),
 						new ElevatorPIDControlCommand(elevator, sensors),
-						new DifferentialPIDControlCommand(differential, sensors, 2)));
+						new DifferentialPIDControlCommand(differential, sensors)));
 
 		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF2)
 				.onTrue(new SequentialCommandGroup(
 						new SetDifferentialLevelInstantCommand(sensors, 1),
 						new ParallelRaceGroup(
-								new DifferentialPIDControlCommand(differential, sensors, 2),
+								new DifferentialPIDControlCommand(differential, sensors),
 								new WaitCommand(1)),
 						new ParallelCommandGroup(
 								new IntakeControlCommand(intake, sensors, -1.0, false),
 								new SetDifferentialLevelInstantCommand(sensors, 2),
 								new ElevatorPIDControlCommand(elevator, sensors),
-								new DifferentialPIDControlCommand(differential, sensors,
-										2))));
+								new DifferentialPIDControlCommand(differential, sensors))));
 
 		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF3)
 				.onTrue(new ParallelCommandGroup(
 						new IntakeControlCommand(intake, sensors, -1.0, false),
 						new SetDifferentialLevelInstantCommand(sensors, 3),
 						new ElevatorPIDControlCommand(elevator, sensors),
-						new DifferentialPIDControlCommand(differential, sensors, 2)));
+						new DifferentialPIDControlCommand(differential, sensors)));
 
 		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF4)
 				.onTrue(new ParallelCommandGroup(
 						new IntakeControlCommand(intake, sensors, -1.0, false),
 						new SetDifferentialLevelInstantCommand(sensors, 4),
 						new ElevatorPIDControlCommand(elevator, sensors),
-						new DifferentialPIDControlCommand(differential, sensors, 2)));
+						new DifferentialPIDControlCommand(differential, sensors)));
 
 		// Algae removal positions
 		new JoystickButton(m_board, ButtonBoardMapping.BB_ALGAEL)
@@ -247,21 +239,19 @@ public class RobotContainer {
 								new IntakeControlCommand(intake, sensors, 1.0, false),
 								new SetDifferentialLevelInstantCommand(sensors, 10),
 								new ElevatorPIDControlCommand(elevator, sensors),
-								new DifferentialPIDControlCommand(differential, sensors, 2))));
+								new DifferentialPIDControlCommand(differential, sensors))));
 
 		new JoystickButton(m_board, ButtonBoardMapping.BB_ALGAEU)
 				.onTrue(new SequentialCommandGroup(
 						new SetDifferentialLevelInstantCommand(sensors, 11),
 						new ParallelRaceGroup(
-								new DifferentialPIDControlCommand(differential, sensors,
-										2),
+								new DifferentialPIDControlCommand(differential, sensors),
 								new WaitCommand(2)),
 						new ParallelCommandGroup(
 								new IntakeControlCommand(intake, sensors, 1.0, false),
 								new SetDifferentialLevelInstantCommand(sensors, 11),
 								new ElevatorPIDControlCommand(elevator, sensors),
-								new DifferentialPIDControlCommand(differential, sensors,
-										2))));
+								new DifferentialPIDControlCommand(differential, sensors))));
 
 		// Reef Rotation
 		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS1)
@@ -324,6 +314,7 @@ public class RobotContainer {
 	// #endregion
 
 	public Command getAutonomousCommand() {
-		return DefaultAuton;
+		return AutoAlignCenterL4;
+		// return
 	}
 }

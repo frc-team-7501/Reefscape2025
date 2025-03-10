@@ -126,7 +126,7 @@ public class Drivetrain extends SubsystemBase {
   private final PIDController xSpeedPIDController = new PIDController(0.6, 0.5, 0.02);
   private final PIDController ySpeedPIDController = new PIDController(0.6, 0.75, 0.02);
   private final PIDController zSpeedPIDController = new PIDController(0.02, 0.03, 0.06);
-  private final PIDController zRotationPIDController = new PIDController(0.1, 0.0, 0.0);
+  private final PIDController zRotationPIDController = new PIDController(0.075, 0.0, 0.01);
 
 
   public void drive(double forward, double strafe, double rotate, boolean fieldRelative, double speedMultiplier,
@@ -178,22 +178,22 @@ public class Drivetrain extends SubsystemBase {
     if (fieldRelative) {
       if (reefRotation == 1) {
         double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 0), 0.75));
-        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * 0.6;
       } else if (reefRotation == 2) {
         double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 300), 0.75));
-        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * 0.6;
       } else if (reefRotation == 3) {
         double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 240), 0.75));
-        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * 0.6;
       } else if (reefRotation == 4) {
         double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 180), 0.75));
-        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * 0.6;
       } else if (reefRotation == 5) {
         double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 120), 0.75));
-        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * 0.6;
       } else if (reefRotation == 6) {
         double rotationOutput = (clampOutput(zRotationPIDController.calculate(getGyroYaw(), 60), 0.75));
-        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * Drivetrain.kMaxAngularSpeed;
+        zSpeed = m_rotLimiter.calculate(MathUtil.applyDeadband(rotationOutput, 0.02)) * 0.6;
       } else {
         zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotate, 0.02)) * Drivetrain.kMaxAngularSpeed;
       }

@@ -4,7 +4,6 @@
 
 package frc.robot.Commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Differential;
 import java.util.function.DoubleSupplier;
@@ -13,15 +12,15 @@ public class DifferentialControlCommand extends Command {
   /** Creates a new Lift Control Command. */
   private final Differential differential;
   private final DoubleSupplier differentialSpeedR;
-  private final DoubleSupplier differentialSpeedL;
+  // private final DoubleSupplier differentialSpeedL;
   private double differentialSpeedDoubleR = 0;  
-  private double differentialSpeedDoubleL = 0;
+  // private double differentialSpeedDoubleL = 0;
 
-  public DifferentialControlCommand(Differential differential, DoubleSupplier differentialSpeedR, DoubleSupplier differentialSpeedL) {
+  public DifferentialControlCommand(Differential differential, DoubleSupplier differentialSpeedR) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.differential = differential;
     this.differentialSpeedR = differentialSpeedR;
-    this.differentialSpeedL = differentialSpeedL;
+    // this.differentialSpeedL = differentialSpeedL;
     addRequirements(differential);
   }
 
@@ -34,16 +33,16 @@ public class DifferentialControlCommand extends Command {
   @Override
   public void execute() {
     differentialSpeedDoubleR = differentialSpeedR.getAsDouble() * 0.2;
-    differentialSpeedDoubleL = differentialSpeedL.getAsDouble() * 0.2;
+    // differentialSpeedDoubleL = differentialSpeedL.getAsDouble() * 0.2;
 
     // Set to zero to compensate for stick drift
     if (Math.abs(differentialSpeedDoubleR) < 0.05)
     differentialSpeedDoubleR = 0;
 
-    if (Math.abs(differentialSpeedDoubleL) < 0.05)
-    differentialSpeedDoubleL = 0;
+    // if (Math.abs(differentialSpeedDoubleL) < 0.05)
+    // differentialSpeedDoubleL = 0;
 
-    differential.moveDifferential(differentialSpeedDoubleR, differentialSpeedDoubleL);
+    differential.moveDifferential(differentialSpeedDoubleR);
   }
 
   // Called once the command ends or is interrupted.
