@@ -4,10 +4,13 @@
 
 package frc.robot;
 
+import java.lang.reflect.WildcardType;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
@@ -30,6 +33,7 @@ import frc.robot.Commands.SetIsFieldCentricInstantCommand;
 import frc.robot.Commands.SetLRCSelectorInstantCommand;
 import frc.robot.Commands.SetReefRotationInstantCommand;
 import frc.robot.Commands.SwerveDriveManualCommand;
+import frc.robot.Commands.Autonomous.AutonDriveCommand;
 import frc.robot.Commands.FunnelControlCommand;
 import frc.robot.Commands.FunnelPIDControlCommand;
 import frc.robot.Subsystems.Drivetrain;
@@ -58,32 +62,36 @@ public class RobotContainer {
 	////////////////////////////////
 	// #region [ AUTON COMMANDS ]
 
-	// #region AutoAlignCenterL4 - DO NOT USE, NOT TESTED
-	private final Command AutoAlignCenterL4 = new SequentialCommandGroup(
+	// #region RightL4Single Competition Ready
+	private final Command RightL4Single = new SequentialCommandGroup(
 			new InstantCommand(
 					() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d(180))),
 					driveTrain),
 
 			// Moves Funnel, Differential, and Elevator to the highest Reef Level
 			new ParallelDeadlineGroup(new WaitCommand(1),
+
 					new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
 					new SetDifferentialLevelInstantCommand(sensors, 4),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
 					new ElevatorPIDControlCommand(elevator, sensors),
 					new DifferentialPIDControlCommand(differential, sensors)),
 
-			new SetLRCSelectorInstantCommand(sensors, 1),
+			new SetLRCSelectorInstantCommand(sensors, 0),
 			new SetIsFieldCentricInstantCommand(sensors, false),
 
 			// Auto Align using Vision to April Tags
 			new ParallelDeadlineGroup(new WaitCommand(5),
+					new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
 					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
 							() -> false),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
 					new ElevatorPIDControlCommand(elevator, sensors),
 					new DifferentialPIDControlCommand(differential, sensors)),
 
 			// Outputs the Coral onto the Reef for half a second
 			new ParallelDeadlineGroup(new WaitCommand(0.5),
-					new IntakeControlCommand(intake, sensors, 1.0, true),
+					new SetDifferentialLevelInstantCommand(sensors, 24),
 					new ElevatorPIDControlCommand(elevator, sensors),
 					new DifferentialPIDControlCommand(differential, sensors)),
 
@@ -102,30 +110,74 @@ public class RobotContainer {
 					new ElevatorPIDControlCommand(elevator, sensors),
 					new DifferentialPIDControlCommand(differential, sensors)),
 
-			new SetIsFieldCentricInstantCommand(sensors, true)
+			new SetIsFieldCentricInstantCommand(sensors, true));
 
-	// // Rotate 180 degrees
-	// new ResetGyroYawInstantCommand(driveTrain),
-	// new AutonDriveCommand(driveTrain, new Pose2d(0, 0, new Rotation2d((0))),
+	// #endregion
 
-	// // Stop moving again
-	// new SwerveDriveManualCommand(driveTrain, sensors, ()-> 0.0, ()-> 0.0, ()->
-	// 0.0, ()-> 0.0, ()-> true)
+	// #region LeftL4Single
+	private final Command LeftL4Single = new SequentialCommandGroup(
+			new InstantCommand(
+					() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d(180))),
+					driveTrain),
 
-	// // Return scoring elements to home position
-	// new ParallelDeadlineGroup(new WaitCommand(2),
-	// new IntakeControlCommand(intake, sensors, -1.0, false),
-	// new SetDifferentialLevelInstantCommand(sensors, 0),
-	// new ElevatorPIDControlCommand(elevator, sensors),
-	// new DifferentialPIDControlCommand(differential, sensors, 2))
+			// Moves Funnel, Differential, and Elevator to the highest Reef Level
+			new ParallelDeadlineGroup(new WaitCommand(1),
 
-	// new AutonDriveCommand(driveTrain, new Pose2d(-24, -134, new Rotation2d(0))),
-	// new AutonDriveCommand(driveTrain, new Pose2d(-35, -134, new Rotation2d(0)))
-	);
+					new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+					new SetDifferentialLevelInstantCommand(sensors, 4),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			new SetLRCSelectorInstantCommand(sensors, 1),
+			new SetIsFieldCentricInstantCommand(sensors, false),
+
+			// Auto Align using Vision to April Tags
+			new ParallelDeadlineGroup(new WaitCommand(5),
+					new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+							() -> false),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			// Outputs the Coral onto the Reef for half a second
+			new ParallelDeadlineGroup(new WaitCommand(0.5),
+					new SetDifferentialLevelInstantCommand(sensors, 24),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			// Backup
+			new ParallelDeadlineGroup(new WaitCommand(0.5),
+					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.25, () -> 0.0, () -> 0.0, () -> 0.0,
+							() -> true),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			// Stop moving and retract scoring elements to home position
+			new ParallelDeadlineGroup(new WaitCommand(2),
+					new SetDifferentialLevelInstantCommand(sensors, 0),
+					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+							() -> true),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			new SetIsFieldCentricInstantCommand(sensors, true));
+
+	// #endregion
+
+	// #region OdometryTest
+	private final Command OdometryTest = new SequentialCommandGroup(
+			new InstantCommand(
+					() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 120))),
+					driveTrain),
+
+			new AutonDriveCommand(driveTrain, (new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180)))));
 
 	// #endregion
 	////////////////////////////////
 	// #endregion
+
 	// Create commands
 
 	// Swerve Control
@@ -174,10 +226,20 @@ public class RobotContainer {
 		// Output
 		m_Xbox.b_RightBumper()
 				.onTrue(new ParallelCommandGroup(
-						new IntakeControlCommand(intake, sensors, 1.0, true),
+						new ConditionalCommand(
+								new SetDifferentialLevelInstantCommand(sensors, 24),
+								new WaitCommand(0.0),
+								() -> sensors.getDifferentialLevel() == 4),
+						new ConditionalCommand(
+								new SetDifferentialLevelInstantCommand(sensors, 23),
+								new WaitCommand(0.0),
+								() -> sensors.getDifferentialLevel() == 3),
+						new ConditionalCommand(
+								new IntakeControlCommand(intake, sensors, -1.0, true),
+								new WaitCommand(0.0),
+								() -> ((sensors.getDifferentialLevel() == 2) || (sensors.getDifferentialLevel() == 1))),
 						new ElevatorPIDControlCommand(elevator, sensors),
 						new DifferentialPIDControlCommand(differential, sensors)));
-
 		m_Xbox.b_RightBumper()
 				.onFalse(new ParallelCommandGroup(
 						new IntakeControlCommand(intake, sensors, 0.0, true),
@@ -205,9 +267,21 @@ public class RobotContainer {
 						new ElevatorPIDControlCommand(elevator, sensors),
 						new DifferentialPIDControlCommand(differential, sensors)));
 
-		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF2)
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF1)
 				.onTrue(new SequentialCommandGroup(
 						new SetDifferentialLevelInstantCommand(sensors, 1),
+						new ParallelRaceGroup(
+								new DifferentialPIDControlCommand(differential, sensors),
+								new WaitCommand(1)),
+						new ParallelCommandGroup(
+								new IntakeControlCommand(intake, sensors, -1.0, false),
+								new SetDifferentialLevelInstantCommand(sensors, 1),
+								new ElevatorPIDControlCommand(elevator, sensors),
+								new DifferentialPIDControlCommand(differential, sensors))));
+
+		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF2)
+				.onTrue(new SequentialCommandGroup(
+						new SetDifferentialLevelInstantCommand(sensors, 2),
 						new ParallelRaceGroup(
 								new DifferentialPIDControlCommand(differential, sensors),
 								new WaitCommand(1)),
@@ -236,7 +310,7 @@ public class RobotContainer {
 				.onTrue(new SequentialCommandGroup(
 						new SetDifferentialLevelInstantCommand(sensors, 10),
 						new ParallelCommandGroup(
-								new IntakeControlCommand(intake, sensors, 1.0, false),
+								new IntakeControlCommand(intake, sensors, -1.0, false),
 								new SetDifferentialLevelInstantCommand(sensors, 10),
 								new ElevatorPIDControlCommand(elevator, sensors),
 								new DifferentialPIDControlCommand(differential, sensors))));
@@ -244,11 +318,8 @@ public class RobotContainer {
 		new JoystickButton(m_board, ButtonBoardMapping.BB_ALGAEU)
 				.onTrue(new SequentialCommandGroup(
 						new SetDifferentialLevelInstantCommand(sensors, 11),
-						new ParallelRaceGroup(
-								new DifferentialPIDControlCommand(differential, sensors),
-								new WaitCommand(2)),
 						new ParallelCommandGroup(
-								new IntakeControlCommand(intake, sensors, 1.0, false),
+								new IntakeControlCommand(intake, sensors, -1.0, false),
 								new SetDifferentialLevelInstantCommand(sensors, 11),
 								new ElevatorPIDControlCommand(elevator, sensors),
 								new DifferentialPIDControlCommand(differential, sensors))));
@@ -278,7 +349,7 @@ public class RobotContainer {
 				.onTrue(new SetReefRotationInstantCommand(sensors, 6));
 		new JoystickButton(m_board, ButtonBoardMapping.BB_REEF_POS6)
 				.onFalse(new SetReefRotationInstantCommand(sensors, 0));
-		
+
 		// Reef scoring selection
 		new JoystickButton(m_board, ButtonBoardMapping.BB_RIGHTALIGN)
 				.onTrue(new SetLRCSelectorInstantCommand(sensors, 1));
@@ -314,7 +385,8 @@ public class RobotContainer {
 	// #endregion
 
 	public Command getAutonomousCommand() {
-		return AutoAlignCenterL4;
-		// return
+		// return LeftL4Single;
+		// return RightL4Single;
+		return OdometryTest;
 	}
 }

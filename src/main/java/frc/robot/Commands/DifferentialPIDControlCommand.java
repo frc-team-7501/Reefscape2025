@@ -34,6 +34,7 @@ public class DifferentialPIDControlCommand extends Command {
   @Override
   public void execute() {
     diffLevel = sensors.getDifferentialLevel();
+    //************  REEF and INTAKE Positions
     if (sensors.getIntakeSensor() && diffLevel == 0) {
       differentialPositionR = 0.60;
       // differentialPositionL = 0.60;
@@ -43,33 +44,41 @@ public class DifferentialPIDControlCommand extends Command {
       // differentialPositionL = 0.03;
     } else if (diffLevel == 1) {
       // set differential for level one
-      differentialPositionR = 0.13;
+      differentialPositionR = 0.15;
       // differentialPositionL = 0.13;
     } else if (diffLevel == 2) {
       // set differential for level two
-      differentialPositionR = -0.03;
+      differentialPositionR = 0.105;
       // differentialPositionL = 0.29;
     } else if (diffLevel == 3) {
       // set differential for level three
-      differentialPositionR = 0.48;
+      differentialPositionR = 0.38;
       // differentialPositionL = 0.48;
     } else if (diffLevel == 4) {
       // set differential for level four
       differentialPositionR = 0.5;
       // differentialPositionL = 0.5;
+    //************  ALGAE Positions
     } else if (diffLevel == 11) {
       // set differential for Algae UPPER Level
-      differentialPositionR = 0.10;
+      differentialPositionR = 0.29;
       // differentialPositionL = 0.43;
     } else if (diffLevel == 10) {
       // set differential for Algae LOWER Level
-      differentialPositionR = 0.42;
+      differentialPositionR = 0.19;
       // differentialPositionL = 0.42;
+    //************  OTHER Positions
     } else if (diffLevel == 13) {
       // set differential for Autonomous Trough
       differentialPositionR = 0.02;
       // differentialPositionL = 0.28;
-    } else {
+    } else if (diffLevel == 23) {
+      //  set differential for Scoring L3
+      differentialPositionR = 0.29;
+    } else if (diffLevel == 24) {
+      //  set differential for Scoring L4
+    differentialPositionR = 0.35;
+  } else {
       // set differential for else
       differentialPositionR = 0.13;
       // differentialPositionL = 0.13;

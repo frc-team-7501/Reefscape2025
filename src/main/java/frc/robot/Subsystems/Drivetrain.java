@@ -155,7 +155,7 @@ public class Drivetrain extends SubsystemBase {
     if (fieldRelative) {
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forward, 0.02)) * speedMultiplier;
      } else {
-      final double forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.5), 0.4));
+      final double forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.45), 0.4));
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.01)) * speedMultiplier;
      }
 

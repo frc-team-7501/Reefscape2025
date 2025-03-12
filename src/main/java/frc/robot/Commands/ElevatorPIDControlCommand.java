@@ -33,28 +33,34 @@ public class ElevatorPIDControlCommand extends Command {
   public void execute() {
     diffLevel = sensors.getDifferentialLevel();
     if (diffLevel == 0) {
-      // set differential for level zero
-      elevatorPosition = -0.2;
+      // set elevator for level zero
+      elevatorPosition = -1.4;
     } else if (diffLevel == 1) {
-      // set differential for level one
-      elevatorPosition = -4.1;
+      // set elevator for level one
+      elevatorPosition = -1.4;
     } else if (diffLevel == 2) {
-      // set differential for level two
-      elevatorPosition = -4.7;
+      // set elevator for level two
+      elevatorPosition = -8.5;
     } else if (diffLevel == 3) {
-      // set differential for level three
-      elevatorPosition = -4.0;
+      // set elevator for level three
+      elevatorPosition = -11.3;
     } else if (diffLevel == 4) {
-      // set differential for level four
-      elevatorPosition = -25.75;
+      // set elevator for level four
+      elevatorPosition = -26.1;
     } else if (diffLevel == 10) {
-      // set differential for Algae Upper Level
-      elevatorPosition = -0.2;
+      // set elevator for Algae Lower Level
+      elevatorPosition = 0.01;
     } else if (diffLevel == 11) {
-      // set differential for Algae Upper Level
-      elevatorPosition = -11.54;
+      // set elevator for Algae Upper Level
+      elevatorPosition = -5.5;
+    } else if (diffLevel == 23) {
+      // set elevator for Scoring L3
+      elevatorPosition = -1.5;
+    } else if (diffLevel == 24) {
+      // set elevator for Scoring L4
+      elevatorPosition = -14.71;
     } else {
-      // set differential for else
+      // set elevator for else
       elevatorPosition = -0.2;
     }
     elevator.pidSetPosition(elevatorPosition);

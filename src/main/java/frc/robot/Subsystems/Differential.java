@@ -9,8 +9,10 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+
+import edu.wpi.first.math.controller.PIDController;
+// import edu.wpi.first.math.controller.ProfiledPIDController;
+// import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,25 +33,25 @@ public class Differential extends SubsystemBase {
   private double offsetR = 0;
   // private double lastRawL = 0;
   private double lastRawR = 0;
-  private double Kp = 5.0;
-  private double Ki = 4.0;
-  private double Kd = 0.0;
+  // private double Kp = 5.0;
+  // private double Ki = 4.0;
+  // private double Kd = 0.0;
 
   // private final PIDController differentialPIDControllerL = new PIDController(2.0, 0.0, 0.0);
-  // private final PIDController differentialPIDControllerR = new PIDController(2.0, 0.0, 0.0);
+  private final PIDController differentialPIDControllerR = new PIDController(2.0, 0.0, 0.0);
   
-  private final TrapezoidProfile.Constraints diffConstraints = new
-  TrapezoidProfile.Constraints(1.0, 0.5);
+  // private final TrapezoidProfile.Constraints diffConstraints = new
+  // TrapezoidProfile.Constraints(1.0, 0.5);
 
   // private final ProfiledPIDController differentialPIDControllerL = new 
   // ProfiledPIDController(Kp, Ki, Kd, diffConstraints, 0.02 );
 
-  private final ProfiledPIDController differentialPIDControllerR = new 
-  ProfiledPIDController(Kp, Ki, Kd, diffConstraints, 0.02);
+  // private final ProfiledPIDController differentialPIDControllerR = new 
+  // ProfiledPIDController(Kp, Ki, Kd, diffConstraints, 0.02);
 
   public Differential() {
     // Create motors, configuration, and PID
-    differentialMotorR = new SparkMax(CANMapping.SPARKMAX_DIFFERENTIAL_R, MotorType.kBrushed);
+    differentialMotorR = new SparkMax(CANMapping.SPARKMAX_DIFFERENTIAL_R, MotorType.kBrushless);
     differentialMotorRConfig = new SparkMaxConfig();
     differentialMotorR.configure(differentialMotorRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     differentialEncoderR.setInverted(true);
