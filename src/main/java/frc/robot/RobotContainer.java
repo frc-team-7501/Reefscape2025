@@ -168,11 +168,52 @@ public class RobotContainer {
 
 	// #region OdometryTest
 	private final Command OdometryTest = new SequentialCommandGroup(
+			// new ResetGyroYawInstantCommand(driveTrain),
 			new InstantCommand(
-					() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 120))),
+			// Rotations in degrees must be multiplied by: (Math.PI / 180)
+					() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180))),
 					driveTrain),
+			
+			// Move to first auto-align point
+			new ParallelDeadlineGroup(new WaitCommand(3.5),
+					new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+					new SetDifferentialLevelInstantCommand(sensors, 4),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors),
+					new AutonDriveCommand(driveTrain, (new Pose2d(75, 0, new Rotation2d((Math.PI / 180) * 120))))),
 
-			new AutonDriveCommand(driveTrain, (new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180)))));
+			// Auto Align using Vision to April Tags
+			new ParallelDeadlineGroup(new WaitCommand(2),
+					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+							() -> false),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			// Outputs the Coral onto the Reef for half a second
+			new ParallelDeadlineGroup(new WaitCommand(1.5),
+					new AutonDriveCommand(driveTrain, (new Pose2d(75, 15, new Rotation2d((Math.PI / 180) * 120)))),
+					new SetDifferentialLevelInstantCommand(sensors, 24),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			// Stop moving and retract scoring elements to home position
+			new ParallelDeadlineGroup(new WaitCommand(7),
+					new AutonDriveCommand(driveTrain, (new Pose2d(235, 60, new Rotation2d((Math.PI / 180) * 60)))),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new SetDifferentialLevelInstantCommand(sensors, 0),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			// 
+			new ParallelDeadlineGroup(new WaitCommand(2),
+					new AutonDriveCommand(driveTrain, (new Pose2d(150, 0, new Rotation2d((Math.PI / 180) * 0)))),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new SetDifferentialLevelInstantCommand(sensors, 0),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors))
+			);
 
 	// #endregion
 	////////////////////////////////

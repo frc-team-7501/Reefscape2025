@@ -12,12 +12,13 @@ import frc.robot.Subsystems.Drivetrain;
 
 public class AutonDriveCommand extends Command {
     private final Drivetrain drivetrain;
-    private final PIDController xController;
-    private final PIDController yController;
+    // private final PIDController xController;
+    // private final PIDController yController;
     private final PIDController angleController;
     private final Pose2d targetPose2d;
-    private static final double DriveSpeed = 12; // inches per second, max value of 220
-    private static final double DriveAcceleration = 45; // *should be in inches/s
+    private static final double DriveSpeed = 120
+    ; // inches per second, max value of 220
+    private static final double DriveAcceleration = 36; // *should be in inches/s
 
     private static final double DriveP = 0.04;
     private static final double DriveI = 0.0;
@@ -49,8 +50,8 @@ public class AutonDriveCommand extends Command {
         this.drivetrain = drivetrain;
         this.targetPose2d = targetPose2d;
 
-        xController = Constants.DriveTrain.PID_X.toPIDController();
-        yController = Constants.DriveTrain.PID_Y.toPIDController();
+        // xController = Constants.DriveTrain.PID_X.toPIDController();
+        // yController = Constants.DriveTrain.PID_Y.toPIDController();
         angleController = Constants.DriveTrain.PID_T.toPIDController();
 
         angleController.enableContinuousInput(-Math.PI, Math.PI);
@@ -63,6 +64,8 @@ public class AutonDriveCommand extends Command {
         Y_PID_Controller.setGoal(targetPose2d.getY());
         X_PID_Controller.setTolerance(3);
         Y_PID_Controller.setTolerance(3);
+        X_PID_Controller.reset(drivetrain.getPose().getX() / MiscMapping.xConversionInches, 0.0);
+        Y_PID_Controller.reset(drivetrain.getPose().getY() / MiscMapping.yConversionInches, 0.0);
         // yController.setSetpoint(targetPose2d.getY() * MiscMapping.yConversionInches);
         angleController.setSetpoint(targetPose2d.getRotation().getRadians());
         SmartDashboard.putNumber("target X", targetPose2d.getX());
@@ -81,8 +84,8 @@ public class AutonDriveCommand extends Command {
         double[] photonPositions = {0.0, 0.0, 0.0, 0.0};
         Pose2d currentPose = drivetrain.getPose();
 
-        double outputX = X_PID_Controller.calculate(currentPose.getX());
-        double outputY = Y_PID_Controller.calculate(currentPose.getY());
+        double outputX = X_PID_Controller.calculate(currentPose.getX() / MiscMapping.xConversionInches);
+        double outputY = Y_PID_Controller.calculate(currentPose.getY() / MiscMapping.yConversionInches);
 
         // double outputX = X_PID_Controller.calculate(currentPose.getX(),
         // targetPose2d.getX() * MiscMapping.xConversionInches);
@@ -103,7 +106,7 @@ public class AutonDriveCommand extends Command {
         // drivetrain.driveRawFieldRelative
         outputX = clampOutput(outputX, 1);
         outputY = clampOutput(outputY, 1);
-        outputT = clampOutput(outputT, 0.75);
+        outputT = clampOutput(outputT, 0.4);
 
         // .putNumber("Clamped outputX", outputX);
         // SmartDashboard.putNumber("Clamped outputY", outputY);
