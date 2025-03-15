@@ -61,11 +61,11 @@ public class DifferentialPIDControlCommand extends Command {
     //************  ALGAE Positions
     } else if (diffLevel == 11) {
       // set differential for Algae UPPER Level
-      differentialPositionR = 0.29;
+      differentialPositionR = 0.31;
       // differentialPositionL = 0.43;
     } else if (diffLevel == 10) {
       // set differential for Algae LOWER Level
-      differentialPositionR = 0.19;
+      differentialPositionR = 0.20;
       // differentialPositionL = 0.42;
     //************  OTHER Positions
     } else if (diffLevel == 13) {

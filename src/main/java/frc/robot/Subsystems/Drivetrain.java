@@ -231,7 +231,7 @@ public class Drivetrain extends SubsystemBase {
     
     if(photonPositions[MiscMapping.VISX] < .2) {
       PhotonLights.set(0.0);
-    } else if (Math.abs(ySpeedPIDController.getError()) < 0.02 && Math.abs(xSpeedPIDController.getError()) < 0.02 && Math.abs(zSpeedPIDController.getError()) < 5) {
+    } else if (Math.abs(ySpeedPIDController.getError()) < 0.03 && Math.abs(xSpeedPIDController.getError()) < 0.03 && Math.abs(zSpeedPIDController.getError()) < 5) {
       PhotonLights.set(1.0);
     } else if (Math.abs(ySpeedPIDController.getError()) < 0.2 && Math.abs(xSpeedPIDController.getError()) < 0.2 && Math.abs(zSpeedPIDController.getError()) < 8) {
       PhotonLights.set(0.4);

@@ -311,13 +311,13 @@ public class RobotContainer {
 
 			// Stop moving and retract scoring elements to home position
 			new ParallelDeadlineGroup(new WaitCommand(7),
-					new AutonDriveCommand(driveTrain, (new Pose2d(235, -60, new Rotation2d((Math.PI / 180) * 300)))),
+					new AutonDriveCommand(driveTrain, (new Pose2d(245, -60, new Rotation2d((Math.PI / 180) * 300)))),
 					new IntakeControlCommand(intake, sensors, -1.0, false),
 					new SetDifferentialLevelInstantCommand(sensors, 0),
 					new ElevatorPIDControlCommand(elevator, sensors),
 					new DifferentialPIDControlCommand(differential, sensors)),
 
-			//
+			// Start moving back towards the Reef
 			new ParallelDeadlineGroup(new WaitCommand(2),
 					new AutonDriveCommand(driveTrain, (new Pose2d(150, 0, new Rotation2d((Math.PI / 180) * 0)))),
 					new IntakeControlCommand(intake, sensors, -1.0, false),
@@ -543,8 +543,8 @@ public class RobotContainer {
 	public Command getAutonomousCommand() {
 		// return LeftL4Single;
 		// return RightL4Single;
-		// return LeftStation;
+		return LeftStation;
 		// return RightStation;
-		return PushRightL4;
+		// return PushRightL4;
 	}
 }
