@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -41,6 +42,8 @@ public class Drivetrain extends SubsystemBase {
       CANMapping.TURN_CANCODER_BL);
   private final SwerveModule m_backRight = new SwerveModule(CANMapping.TALONFX_DRIVE_BR, CANMapping.SPARKMAX_TURN_BR,
       CANMapping.TURN_CANCODER_BR);
+  
+  private final Servo PhotonLights = new Servo(0);
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
@@ -154,8 +157,10 @@ public class Drivetrain extends SubsystemBase {
     // negative values when we push forward.
     if (fieldRelative) {
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forward, 0.02)) * speedMultiplier;
+     } else if (photonPositions[MiscMapping.VISX] < 0.2) {
+      xSpeed = 0.0;
      } else {
-      final double forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.45), 0.4));
+      final double forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.47), 0.4));
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.01)) * speedMultiplier;
      }
 
@@ -164,6 +169,8 @@ public class Drivetrain extends SubsystemBase {
     // return positive values when you pull to the right by default.
      if (fieldRelative) {
       ySpeed = -m_xspeedLimiter.calculate(MathUtil.applyDeadband(strafe, 0.02)) * speedMultiplier;
+     } else if (photonPositions[MiscMapping.VISX] < 0.2) {
+      ySpeed = 0.0;
      } else {
       final double strafeOutput = -(clampOutput(ySpeedPIDController.calculate(photonPositions[MiscMapping.VISY], yVisOffset), 0.4));
       // SmartDashboard.putNumber("strafe",strafeOutput);
@@ -198,6 +205,8 @@ public class Drivetrain extends SubsystemBase {
         zSpeed = -m_rotLimiter.calculate(MathUtil.applyDeadband(rotate, 0.02)) * Drivetrain.kMaxAngularSpeed;
       }
       
+     }else if (photonPositions[MiscMapping.VISX] < 0.2) {
+      zSpeed = 0.0;
      } else {
       double rotationOutput = (clampOutput(zSpeedPIDController.calculate(photonPositions[MiscMapping.VISZ]), 0.5));
       // SmartDashboard.putNumber("rotation", rotationOutput);
@@ -219,6 +228,16 @@ public class Drivetrain extends SubsystemBase {
     // xSpeed = 0.0;
     // ySpeed = 0.0;
     // zSpeed = 0.0;
+    
+    if(photonPositions[MiscMapping.VISX] < .2) {
+      PhotonLights.set(0.0);
+    } else if (Math.abs(ySpeedPIDController.getError()) < 0.02 && Math.abs(xSpeedPIDController.getError()) < 0.02 && Math.abs(zSpeedPIDController.getError()) < 5) {
+      PhotonLights.set(1.0);
+    } else if (Math.abs(ySpeedPIDController.getError()) < 0.2 && Math.abs(xSpeedPIDController.getError()) < 0.2 && Math.abs(zSpeedPIDController.getError()) < 8) {
+      PhotonLights.set(0.4);
+    } else {
+      PhotonLights.set(0.4);
+    }
     if (fieldRelative) {
       swerveModuleStates = Constants.DriveTrain.KINEMATICS.toSwerveModuleStates(
           ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, zSpeed, getGyroYaw2d()));

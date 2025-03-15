@@ -52,7 +52,7 @@ public class DifferentialPIDControlCommand extends Command {
       // differentialPositionL = 0.29;
     } else if (diffLevel == 3) {
       // set differential for level three
-      differentialPositionR = 0.38;
+      differentialPositionR = 0.105;
       // differentialPositionL = 0.48;
     } else if (diffLevel == 4) {
       // set differential for level four

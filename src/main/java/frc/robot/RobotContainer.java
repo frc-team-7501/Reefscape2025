@@ -166,14 +166,75 @@ public class RobotContainer {
 
 	// #endregion
 
-	// #region OdometryTest
-	private final Command OdometryTest = new SequentialCommandGroup(
+	// #region PushRightL4
+	private final Command PushRightL4 = new SequentialCommandGroup(
+		new InstantCommand(
+				() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d((Math.PI/180) * 180))),
+				driveTrain),
+		
+		// Move the other bot fowards
+		new ParallelDeadlineGroup(new WaitCommand(1),
+				new AutonDriveCommand(driveTrain, (new Pose2d(15, 0, new Rotation2d((Math.PI / 180) * 180))))),
+
+		// Move again to auto align position
+		new ParallelDeadlineGroup(new WaitCommand(3),
+				new AutonDriveCommand(driveTrain, (new Pose2d(0, 48, new Rotation2d((Math.PI / 180) * 180))))),
+
+		// Moves Funnel, Differential, and Elevator to the highest Reef Level
+		new ParallelDeadlineGroup(new WaitCommand(1),
+
+				new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+				new SetDifferentialLevelInstantCommand(sensors, 4),
+				new IntakeControlCommand(intake, sensors, -1.0, false),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		new SetLRCSelectorInstantCommand(sensors, 1),
+		new SetIsFieldCentricInstantCommand(sensors, false),
+
+		// Auto Align using Vision to April Tags
+		new ParallelDeadlineGroup(new WaitCommand(5),
+				new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+				new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+						() -> false),
+				new IntakeControlCommand(intake, sensors, -1.0, false),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		// Outputs the Coral onto the Reef for half a second
+		new ParallelDeadlineGroup(new WaitCommand(0.5),
+				new SetDifferentialLevelInstantCommand(sensors, 24),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		// Backup
+		new ParallelDeadlineGroup(new WaitCommand(1),
+				new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.25, () -> 0.0, () -> 0.0, () -> 0.0,
+						() -> true),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		// Stop moving and retract scoring elements to home position
+		new ParallelDeadlineGroup(new WaitCommand(2),
+				new SetDifferentialLevelInstantCommand(sensors, 0),
+				new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+						() -> true),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		new SetIsFieldCentricInstantCommand(sensors, true));
+
+
+	// #endregion
+
+	// #region RightStation
+	private final Command RightStation = new SequentialCommandGroup(
 			// new ResetGyroYawInstantCommand(driveTrain),
 			new InstantCommand(
-			// Rotations in degrees must be multiplied by: (Math.PI / 180)
+					// Rotations in degrees must be multiplied by: (Math.PI / 180)
 					() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180))),
 					driveTrain),
-			
+
 			// Move to first auto-align point
 			new ParallelDeadlineGroup(new WaitCommand(3.5),
 					new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
@@ -206,14 +267,63 @@ public class RobotContainer {
 					new ElevatorPIDControlCommand(elevator, sensors),
 					new DifferentialPIDControlCommand(differential, sensors)),
 
-			// 
+			//
 			new ParallelDeadlineGroup(new WaitCommand(2),
 					new AutonDriveCommand(driveTrain, (new Pose2d(150, 0, new Rotation2d((Math.PI / 180) * 0)))),
 					new IntakeControlCommand(intake, sensors, -1.0, false),
 					new SetDifferentialLevelInstantCommand(sensors, 0),
 					new ElevatorPIDControlCommand(elevator, sensors),
-					new DifferentialPIDControlCommand(differential, sensors))
-			);
+					new DifferentialPIDControlCommand(differential, sensors)));
+
+	// #endregion
+
+	// #region LeftStation
+	private final Command LeftStation = new SequentialCommandGroup(
+			// new ResetGyroYawInstantCommand(driveTrain),
+			new InstantCommand(
+					// Rotations in degrees must be multiplied by: (Math.PI / 180)
+					() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180))),
+					driveTrain),
+
+			// Move to first auto-align point
+			new ParallelDeadlineGroup(new WaitCommand(3.5),
+					new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+					new SetDifferentialLevelInstantCommand(sensors, 4),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors),
+					new AutonDriveCommand(driveTrain, (new Pose2d(75, 0, new Rotation2d((Math.PI / 180) * 240))))),
+
+			// Auto Align using Vision to April Tags
+			new ParallelDeadlineGroup(new WaitCommand(2),
+					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+							() -> false),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			// Outputs the Coral onto the Reef for half a second
+			new ParallelDeadlineGroup(new WaitCommand(1.5),
+					new AutonDriveCommand(driveTrain, (new Pose2d(75, -15, new Rotation2d((Math.PI / 180) * 240)))),
+					new SetDifferentialLevelInstantCommand(sensors, 24),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			// Stop moving and retract scoring elements to home position
+			new ParallelDeadlineGroup(new WaitCommand(7),
+					new AutonDriveCommand(driveTrain, (new Pose2d(235, -60, new Rotation2d((Math.PI / 180) * 300)))),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new SetDifferentialLevelInstantCommand(sensors, 0),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)),
+
+			//
+			new ParallelDeadlineGroup(new WaitCommand(2),
+					new AutonDriveCommand(driveTrain, (new Pose2d(150, 0, new Rotation2d((Math.PI / 180) * 0)))),
+					new IntakeControlCommand(intake, sensors, -1.0, false),
+					new SetDifferentialLevelInstantCommand(sensors, 0),
+					new ElevatorPIDControlCommand(elevator, sensors),
+					new DifferentialPIDControlCommand(differential, sensors)));
 
 	// #endregion
 	////////////////////////////////
@@ -271,14 +381,18 @@ public class RobotContainer {
 								new SetDifferentialLevelInstantCommand(sensors, 24),
 								new WaitCommand(0.0),
 								() -> sensors.getDifferentialLevel() == 4),
-						new ConditionalCommand(
-								new SetDifferentialLevelInstantCommand(sensors, 23),
-								new WaitCommand(0.0),
-								() -> sensors.getDifferentialLevel() == 3),
+						// new ConditionalCommand(
+						// 		new SetDifferentialLevelInstantCommand(sensors, 23),
+						// 		new WaitCommand(0.0),
+						// 		() -> sensors.getDifferentialLevel() == 3),
+						// new ConditionalCommand(
+						// 	    new IntakeControlCommand(intake, sensors, 1.0, true),
+						// 		new WaitCommand(0.0),
+						// 		() -> sensors.getDifferentialLevel() == 3),
 						new ConditionalCommand(
 								new IntakeControlCommand(intake, sensors, -1.0, true),
 								new WaitCommand(0.0),
-								() -> ((sensors.getDifferentialLevel() == 2) || (sensors.getDifferentialLevel() == 1))),
+								() -> ((sensors.getDifferentialLevel() == 2) || (sensors.getDifferentialLevel() == 1)|| (sensors.getDifferentialLevel() == 3))),
 						new ElevatorPIDControlCommand(elevator, sensors),
 						new DifferentialPIDControlCommand(differential, sensors)));
 		m_Xbox.b_RightBumper()
@@ -325,7 +439,8 @@ public class RobotContainer {
 						new SetDifferentialLevelInstantCommand(sensors, 2),
 						new ParallelRaceGroup(
 								new DifferentialPIDControlCommand(differential, sensors),
-								new WaitCommand(1)),
+								new WaitCommand(1),
+								new IntakeControlCommand(intake, sensors, -1.0, false)),
 						new ParallelCommandGroup(
 								new IntakeControlCommand(intake, sensors, -1.0, false),
 								new SetDifferentialLevelInstantCommand(sensors, 2),
@@ -428,6 +543,8 @@ public class RobotContainer {
 	public Command getAutonomousCommand() {
 		// return LeftL4Single;
 		// return RightL4Single;
-		return OdometryTest;
+		// return LeftStation;
+		// return RightStation;
+		return PushRightL4;
 	}
 }

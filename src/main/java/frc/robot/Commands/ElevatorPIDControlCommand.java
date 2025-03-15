@@ -43,7 +43,7 @@ public class ElevatorPIDControlCommand extends Command {
       elevatorPosition = -8.5;
     } else if (diffLevel == 3) {
       // set elevator for level three
-      elevatorPosition = -11.3;
+      elevatorPosition = -22.7;
     } else if (diffLevel == 4) {
       // set elevator for level four
       elevatorPosition = -26.1;
