@@ -100,7 +100,8 @@ public class Sensors extends SubsystemBase {
     var result = photonCamera.getLatestResult();
     target = result.getBestTarget();
     // Defaults values to zero
-    double[] photonPositions = { 0.0, 0.0, 0.0, 0.0 };
+    // IF YOU CHANGE THIS ARRAY CHANGE IT IN AUTONOMOUS
+    double[] photonPositions = { 0.0, 0.0, 0.0, 0.0, diffLevel };
     // If it sees a target
     if (result.hasTargets()) {
       targetID = target.getFiducialId();

@@ -178,6 +178,67 @@ public class RobotContainer {
 
 		// Move again to auto align position
 		new ParallelDeadlineGroup(new WaitCommand(3),
+				new AutonDriveCommand(driveTrain, (new Pose2d(0, -48, new Rotation2d((Math.PI / 180) * 180))))),
+
+		// Moves Funnel, Differential, and Elevator to the highest Reef Level
+		new ParallelDeadlineGroup(new WaitCommand(1),
+
+				new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+				new SetDifferentialLevelInstantCommand(sensors, 4),
+				new IntakeControlCommand(intake, sensors, -1.0, false),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		new SetLRCSelectorInstantCommand(sensors, 1),
+		new SetIsFieldCentricInstantCommand(sensors, false),
+
+		// Auto Align using Vision to April Tags
+		new ParallelDeadlineGroup(new WaitCommand(5),
+				new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+				new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+						() -> false),
+				new IntakeControlCommand(intake, sensors, -1.0, false),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		// Outputs the Coral onto the Reef for half a second
+		new ParallelDeadlineGroup(new WaitCommand(0.5),
+				new SetDifferentialLevelInstantCommand(sensors, 24),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		// Backup
+		new ParallelDeadlineGroup(new WaitCommand(1),
+				new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.25, () -> 0.0, () -> 0.0, () -> 0.0,
+						() -> true),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		// Stop moving and retract scoring elements to home position
+		new ParallelDeadlineGroup(new WaitCommand(2),
+				new SetDifferentialLevelInstantCommand(sensors, 0),
+				new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+						() -> true),
+				new ElevatorPIDControlCommand(elevator, sensors),
+				new DifferentialPIDControlCommand(differential, sensors)),
+
+		new SetIsFieldCentricInstantCommand(sensors, true));
+
+
+	// #endregion
+
+	// #region PushLeftL4
+	private final Command PushLeftL4 = new SequentialCommandGroup(
+		new InstantCommand(
+				() -> driveTrain.resetPose(new Pose2d(0, 0, new Rotation2d((Math.PI/180) * 180))),
+				driveTrain),
+		
+		// Move the other bot fowards
+		new ParallelDeadlineGroup(new WaitCommand(1),
+				new AutonDriveCommand(driveTrain, (new Pose2d(15, 0, new Rotation2d((Math.PI / 180) * 180))))),
+
+		// Move again to auto align position
+		new ParallelDeadlineGroup(new WaitCommand(3),
 				new AutonDriveCommand(driveTrain, (new Pose2d(0, 48, new Rotation2d((Math.PI / 180) * 180))))),
 
 		// Moves Funnel, Differential, and Elevator to the highest Reef Level
@@ -543,8 +604,9 @@ public class RobotContainer {
 	public Command getAutonomousCommand() {
 		// return LeftL4Single;
 		// return RightL4Single;
-		return LeftStation;
+		// return LeftStation;
 		// return RightStation;
 		// return PushRightL4;
+		return PushLeftL4;
 	}
 }

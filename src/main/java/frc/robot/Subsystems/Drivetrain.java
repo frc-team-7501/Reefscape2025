@@ -130,7 +130,7 @@ public class Drivetrain extends SubsystemBase {
   private final PIDController ySpeedPIDController = new PIDController(0.6, 0.75, 0.02);
   private final PIDController zSpeedPIDController = new PIDController(0.02, 0.03, 0.06);
   private final PIDController zRotationPIDController = new PIDController(0.075, 0.0, 0.01);
-
+  
 
   public void drive(double forward, double strafe, double rotate, boolean fieldRelative, double speedMultiplier,
       double pixySensorEncoder, double[] photonPositions, int LRC, int reefRotation) {
@@ -160,7 +160,13 @@ public class Drivetrain extends SubsystemBase {
      } else if (photonPositions[MiscMapping.VISX] < 0.2) {
       xSpeed = 0.0;
      } else {
-      final double forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.47), 0.4));
+      double forwardOutput;
+      if (photonPositions[4] == 4) {
+         forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.47), 0.4));
+      } else{
+         forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.4), 0.4));
+      }
+      // final double forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.47), 0.4));
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.01)) * speedMultiplier;
      }
 
@@ -223,6 +229,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Pigeon Yaw", getGyroYaw());
     SmartDashboard.putNumber("ReefRot", reefRotation);
     SmartDashboard.putNumber("VISZ", photonPositions[MiscMapping.VISZ]);
+    // SmartDashboard.putNumber("pho5", photonPositions[4]);
 
 
     // xSpeed = 0.0;

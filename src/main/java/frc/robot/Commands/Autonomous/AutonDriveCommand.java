@@ -81,7 +81,7 @@ public class AutonDriveCommand extends Command {
 
     @Override
     public void execute() {
-        double[] photonPositions = {0.0, 0.0, 0.0, 0.0};
+        double[] photonPositions = {0.0, 0.0, 0.0, 0.0, 4};
         Pose2d currentPose = drivetrain.getPose();
 
         double outputX = X_PID_Controller.calculate(currentPose.getX() / MiscMapping.xConversionInches);
