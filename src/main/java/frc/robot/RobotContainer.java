@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.lang.reflect.WildcardType;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -176,9 +174,13 @@ public class RobotContainer {
 		new ParallelDeadlineGroup(new WaitCommand(1),
 				new AutonDriveCommand(driveTrain, (new Pose2d(15, 0, new Rotation2d((Math.PI / 180) * 180))))),
 
-		// Move again to auto align position
+		// Move to auto align starting position
 		new ParallelDeadlineGroup(new WaitCommand(3),
 				new AutonDriveCommand(driveTrain, (new Pose2d(0, -48, new Rotation2d((Math.PI / 180) * 180))))),
+
+		// Move again to auto align position
+		new ParallelDeadlineGroup(new WaitCommand(3),
+		new AutonDriveCommand(driveTrain, (new Pose2d(36, -48, new Rotation2d((Math.PI / 180) * 180))))),
 
 		// Moves Funnel, Differential, and Elevator to the highest Reef Level
 		new ParallelDeadlineGroup(new WaitCommand(1),
@@ -237,9 +239,13 @@ public class RobotContainer {
 		new ParallelDeadlineGroup(new WaitCommand(1),
 				new AutonDriveCommand(driveTrain, (new Pose2d(15, 0, new Rotation2d((Math.PI / 180) * 180))))),
 
-		// Move again to auto align position
+		// Move to auto align starting position
 		new ParallelDeadlineGroup(new WaitCommand(3),
 				new AutonDriveCommand(driveTrain, (new Pose2d(0, 48, new Rotation2d((Math.PI / 180) * 180))))),
+
+		// Move again to auto align position
+		new ParallelDeadlineGroup(new WaitCommand(3),
+				new AutonDriveCommand(driveTrain, (new Pose2d(36, 48, new Rotation2d((Math.PI / 180) * 180))))),
 
 		// Moves Funnel, Differential, and Elevator to the highest Reef Level
 		new ParallelDeadlineGroup(new WaitCommand(1),
@@ -306,7 +312,7 @@ public class RobotContainer {
 					new AutonDriveCommand(driveTrain, (new Pose2d(75, 0, new Rotation2d((Math.PI / 180) * 120))))),
 
 			// Auto Align using Vision to April Tags
-			new ParallelDeadlineGroup(new WaitCommand(2),
+			new ParallelDeadlineGroup(new WaitCommand(3),
 					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
 							() -> false),
 					new IntakeControlCommand(intake, sensors, -1.0, false),
@@ -356,7 +362,7 @@ public class RobotContainer {
 					new AutonDriveCommand(driveTrain, (new Pose2d(75, 0, new Rotation2d((Math.PI / 180) * 240))))),
 
 			// Auto Align using Vision to April Tags
-			new ParallelDeadlineGroup(new WaitCommand(2),
+			new ParallelDeadlineGroup(new WaitCommand(3),
 					new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
 							() -> false),
 					new IntakeControlCommand(intake, sensors, -1.0, false),
@@ -418,6 +424,7 @@ public class RobotContainer {
 	// DifferentialControlCommand(differential, () -> m_Xbox2.getRightY(), () ->
 	// m_Xbox2.getRightY() * -1);
 
+/***************************BUTTONS************************** */
 	// #region Button Bindings
 	private void configureButtonBindings() {
 
@@ -440,6 +447,7 @@ public class RobotContainer {
 				.onTrue(new ParallelCommandGroup(
 						new ConditionalCommand(
 								new SetDifferentialLevelInstantCommand(sensors, 24),
+														// new IntakeControlCommand(intake, sensors, -1.0, false)),
 								new WaitCommand(0.0),
 								() -> sensors.getDifferentialLevel() == 4),
 						// new ConditionalCommand(
@@ -605,8 +613,8 @@ public class RobotContainer {
 		// return LeftL4Single;
 		// return RightL4Single;
 		// return LeftStation;
-		// return RightStation;
+		return RightStation;
 		// return PushRightL4;
-		return PushLeftL4;
+		// return PushLeftL4;
 	}
 }
