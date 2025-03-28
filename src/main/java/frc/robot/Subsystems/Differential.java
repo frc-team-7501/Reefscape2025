@@ -29,16 +29,11 @@ public class Differential extends SubsystemBase {
   //     DIOMapping.DIFFERENTIAL_ENCODER_L);
   private final DutyCycleEncoder differentialEncoderR = new DutyCycleEncoder(
       DIOMapping.DIFFERENTIAL_ENCODER_R);
-  // private double offsetL = 0;
   private double offsetR = 0;
-  // private double lastRawL = 0;
   private double lastRawR = 0;
-  // private double Kp = 5.0;
-  // private double Ki = 4.0;
-  // private double Kd = 0.0;
 
   // private final PIDController differentialPIDControllerL = new PIDController(2.0, 0.0, 0.0);
-  private final PIDController differentialPIDControllerR = new PIDController(2.0, 0.0, 0.0);
+  private final PIDController differentialPIDControllerR = new PIDController(4.0, 0.0, 0.0);
   
   // private final TrapezoidProfile.Constraints diffConstraints = new
   // TrapezoidProfile.Constraints(1.0, 0.5);
@@ -126,9 +121,7 @@ public class Differential extends SubsystemBase {
   // PID command
   public void pidSetPosition(double positionR, double positionL) {
 
-    differentialMotorR.set(clampOutput(-differentialPIDControllerR.calculate(getContinuousPositionR(), positionR), 0.50));
-    // differentialMotorL.set(clampOutput( differentialPIDControllerL.calculate(getContinuousPositionL(), positionL), 0.50));
-    // differentialMotorL.set(clampOutput( differentialPIDControllerL.calculate(getContinuousPositionL(), positionL) + ((getContinuousPositionL() - 0.09) * 0.25), 0.50));
+    differentialMotorR.set(clampOutput(-differentialPIDControllerR.calculate(getContinuousPositionR(), positionR), 0.70));
   }
 
   public void stop() {

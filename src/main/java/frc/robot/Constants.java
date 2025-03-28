@@ -68,7 +68,7 @@ public final class Constants {
         public static final boolean BRAKE_OFF = false;
         public static final boolean FIELD_RELATIVE = true;
         public static final double MAXSPEED = 1;
-        public static final double MAXANGULARSPEED = 0.35;
+        public static final double MAXANGULARSPEED = 0.5;
         public static final double NORMAL_MULTIPLIER = 0.6;
         public static final double TURBO_MULTIPLIER = 1;
         public static final double PHOTON_AREA_GOAL = 19;

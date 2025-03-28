@@ -126,8 +126,8 @@ public class Drivetrain extends SubsystemBase {
    * @param photonYaw     If apriltag 5 or 6 is seen send the yaw
    */
 
-  private final PIDController xSpeedPIDController = new PIDController(0.6, 0.5, 0.02);
-  private final PIDController ySpeedPIDController = new PIDController(0.6, 0.75, 0.02);
+  private final PIDController xSpeedPIDController = new PIDController(1.4, 0.0, 0.03);
+  private final PIDController ySpeedPIDController = new PIDController(1.4, 0.0, 0.03);
   private final PIDController zSpeedPIDController = new PIDController(0.02, 0.03, 0.06);
   private final PIDController zRotationPIDController = new PIDController(0.075, 0.0, 0.01);
   
@@ -151,7 +151,7 @@ public class Drivetrain extends SubsystemBase {
     if (LRC == 0) {
       yVisOffset = -0.15;
     } else {
-      yVisOffset = 0.15;
+      yVisOffset = 0.16;
     }
     // Get the y speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
@@ -161,12 +161,12 @@ public class Drivetrain extends SubsystemBase {
       xSpeed = 0.0;
      } else {
       double forwardOutput;
-      if (photonPositions[4] == 4) {
+      if (photonPositions[4] == 4 || photonPositions[4] == 3 || photonPositions[4] == 0) {
          forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.47), 0.4));
       } else{
          forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.4), 0.4));
       }
-      // final double forwardOutput = -(clampOutput(xSpeedPIDController.calculate(photonPositions[MiscMapping.VISX], 0.47), 0.4));
+      SmartDashboard.putNumber("Pos", photonPositions[4]);
       xSpeed = -m_yspeedLimiter.calculate(MathUtil.applyDeadband(forwardOutput, 0.01)) * speedMultiplier;
      }
 
@@ -214,7 +214,7 @@ public class Drivetrain extends SubsystemBase {
      }else if (photonPositions[MiscMapping.VISX] < 0.2) {
       zSpeed = 0.0;
      } else {
-      double rotationOutput = (clampOutput(zSpeedPIDController.calculate(photonPositions[MiscMapping.VISZ]), 0.5));
+      double rotationOutput = (clampOutput(zSpeedPIDController.calculate(photonPositions[MiscMapping.VISZ]), 0.35));
       // SmartDashboard.putNumber("rotation", rotationOutput);
       // SmartDashboard.putNumber("zError", zSpeedPIDController.getError());
       if (Math.abs(zSpeedPIDController.getError()) < 1) {

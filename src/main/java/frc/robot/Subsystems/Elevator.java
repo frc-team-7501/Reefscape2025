@@ -38,7 +38,7 @@ public class Elevator extends SubsystemBase {
         .p(0.4)
         .i(0.0)
         .d(0.05)
-        .outputRange(-0.3, 0.3);
+        .outputRange(-0.7, 0.7);
 
     elevatorMotorB.configure(elevatorMotorBConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
