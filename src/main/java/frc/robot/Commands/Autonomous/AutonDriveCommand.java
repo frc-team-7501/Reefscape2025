@@ -18,7 +18,7 @@ public class AutonDriveCommand extends Command {
     private final Pose2d targetPose2d;
     private static final double DriveSpeed = 160
     ; // inches per second, max value of 220
-    private static final double DriveAcceleration = 80; // *should be in inches/s
+    private static final double DriveAcceleration = 101; // *should be in inches/s
 
     private static final double DriveP = 0.04;
     private static final double DriveI = 0.0;
