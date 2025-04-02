@@ -61,6 +61,240 @@ public class RobotContainer {
     ////////////////////////////////
     // #region [ AUTON COMMANDS ]
 
+    // #region LeftBreakout
+    private final Command LeftBreakout = new SequentialCommandGroup(
+            // new ResetGyroYawInstantCommand(driveTrain),
+            new SetLRCSelectorInstantCommand(sensors, 0),
+            new InstantCommand(
+                    // Rotations in degrees must be multiplied by: (Math.PI / 180)
+                    () -> driveTrain.resetPose(
+                            new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180))),
+                    driveTrain),
+
+            // Move to first auto-align point
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new DifferentialPIDControlCommand(differential, sensors),
+                    new AutonDriveCommand(driveTrain, (new Pose2d(30, 0, new Rotation2d((Math.PI / 180) * 180))))),
+
+            // Auto Align using Vision to April Tags
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+                            () -> false),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 4),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.5),
+                                    new ElevatorPIDControlCommand(elevator, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(1.75),
+                                    new DifferentialPIDControlCommand(differential, sensors),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
+
+            // Outputs coral onto the L4 Reef
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(20, 0, new Rotation2d((Math.PI / 180) * 180)))),
+                    new SetDifferentialLevelInstantCommand(sensors, 24),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.2),
+                                    new DifferentialPIDControlCommand(differential, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(0.4),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
+                        
+            new SetLRCSelectorInstantCommand(sensors, 1),
+
+            // Move to wall
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(20, -120, new Rotation2d((Math.PI / 180) * 300)))),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
+
+            // Move to source
+            new ParallelRaceGroup(
+                    new AutonBeamBreakCommand(sensors),
+                    new ParallelDeadlineGroup(new WaitCommand(7),
+                            new AutonDriveCommand(driveTrain,
+                                    (new Pose2d(210, -120, new Rotation2d((Math.PI / 180) * 300)))),
+                            new IntakeControlCommand(intake, sensors, -1.0, false),
+                            new SetDifferentialLevelInstantCommand(sensors, 0),
+                            new ElevatorPIDControlCommand(elevator, sensors),
+                            new DifferentialPIDControlCommand(differential, sensors))),
+
+            // Move to wall
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(50, -120, new Rotation2d((Math.PI / 180) * 180)))),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
+
+            // Move to Auto-Align
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(50, 0, new Rotation2d((Math.PI / 180) * 180)))),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
+
+            // Auto Align using Vision to April Tags
+            new ParallelDeadlineGroup(new WaitCommand(2.5),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+                            () -> false),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 4),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.5),
+                                    new ElevatorPIDControlCommand(elevator, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(1.75),
+                                    new DifferentialPIDControlCommand(differential, sensors),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
+
+            // Outputs coral onto the L4 Reef
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(40, 0, new Rotation2d((Math.PI / 180) * 180)))),
+                    new SetDifferentialLevelInstantCommand(sensors, 24),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.2),
+                                    new DifferentialPIDControlCommand(differential, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(0.4),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
+
+            // Stop moving and retract scoring elements to home position
+            new ParallelDeadlineGroup(new WaitCommand(1),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0,
+                            () -> 0.0, () -> 0.0,
+                            () -> true),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors))
+    );
+    // #endregion LeftBreakout
+
+    // #region RightBreakout
+    private final Command RightBreakout = new SequentialCommandGroup(
+            // new ResetGyroYawInstantCommand(driveTrain),
+            new SetLRCSelectorInstantCommand(sensors, 1),
+            new InstantCommand(
+                    // Rotations in degrees must be multiplied by: (Math.PI / 180)
+                    () -> driveTrain.resetPose(
+                            new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180))),
+                    driveTrain),
+
+            // Move to first auto-align point
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new DifferentialPIDControlCommand(differential, sensors),
+                    new AutonDriveCommand(driveTrain, (new Pose2d(30, 0, new Rotation2d((Math.PI / 180) * 180))))),
+
+            // Auto Align using Vision to April Tags
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+                            () -> false),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 4),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.5),
+                                    new ElevatorPIDControlCommand(elevator, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(1.75),
+                                    new DifferentialPIDControlCommand(differential, sensors),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
+
+            // Outputs coral onto the L4 Reef
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(20, 0, new Rotation2d((Math.PI / 180) * 180)))),
+                    new SetDifferentialLevelInstantCommand(sensors, 24),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.2),
+                                    new DifferentialPIDControlCommand(differential, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(0.4),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
+                        
+            new SetLRCSelectorInstantCommand(sensors, 0),
+
+            // Move to wall
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(20, 120, new Rotation2d((Math.PI / 180) * 60)))),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
+
+            // Move to source
+            new ParallelRaceGroup(
+                    new AutonBeamBreakCommand(sensors),
+                    new ParallelDeadlineGroup(new WaitCommand(7),
+                            new AutonDriveCommand(driveTrain,
+                                    (new Pose2d(210, 120, new Rotation2d((Math.PI / 180) * 60)))),
+                            new IntakeControlCommand(intake, sensors, -1.0, false),
+                            new SetDifferentialLevelInstantCommand(sensors, 0),
+                            new ElevatorPIDControlCommand(elevator, sensors),
+                            new DifferentialPIDControlCommand(differential, sensors))),
+
+            // Move to wall
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(20, 120, new Rotation2d((Math.PI / 180) * 180)))),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
+
+            // Move to Auto-Align
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(20, 0, new Rotation2d((Math.PI / 180) * 180)))),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
+
+            // Auto Align using Vision to April Tags
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+                            () -> false),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new SetDifferentialLevelInstantCommand(sensors, 4),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.5),
+                                    new ElevatorPIDControlCommand(elevator, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(1.75),
+                                    new DifferentialPIDControlCommand(differential, sensors),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
+
+            // Outputs coral onto the L4 Reef
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(20, 0, new Rotation2d((Math.PI / 180) * 180)))),
+                    new SetDifferentialLevelInstantCommand(sensors, 24),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.2),
+                                    new DifferentialPIDControlCommand(differential, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(0.4),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
+
+            // Stop moving and retract scoring elements to home position
+            new ParallelDeadlineGroup(new WaitCommand(1),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0,
+                            () -> 0.0, () -> 0.0,
+                            () -> true),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors))
+    );
+    // #endregion RightBreakout
+
     // #region CenterLeftL4
     private final Command CenterLeftL4 = new SequentialCommandGroup(
             // new ResetGyroYawInstantCommand(driveTrain),
@@ -144,7 +378,16 @@ public class RobotContainer {
                             new ParallelDeadlineGroup(new WaitCommand(0.2),
                                     new DifferentialPIDControlCommand(differential, sensors)),
                             new ParallelDeadlineGroup(new WaitCommand(0.4),
-                                    new ElevatorPIDControlCommand(elevator, sensors)))));
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
+
+            // Stop moving and retract scoring elements to home position
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0,
+                            () -> 0.0, () -> 0.0,
+                            () -> true),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)));
     // #endregion CenterRightL4
 
     // #region RightL4Single
@@ -259,150 +502,148 @@ public class RobotContainer {
 
     // #region PushRightL4
     private final Command PushRightL4 = new SequentialCommandGroup(
-        new InstantCommand(
-            () -> driveTrain.resetPose(
-                    new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180))),
-            driveTrain),
+            new InstantCommand(
+                    () -> driveTrain.resetPose(
+                            new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180))),
+                    driveTrain),
 
-    // Move the other bot fowards
-    new ParallelDeadlineGroup(new WaitCommand(0.5),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(5, 0, new Rotation2d((Math.PI / 180) * 180))))),
+            // Move the other bot fowards
+            new ParallelDeadlineGroup(new WaitCommand(0.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(5, 0, new Rotation2d((Math.PI / 180) * 180))))),
 
-    // Move to auto align starting position
-    new ParallelDeadlineGroup(new WaitCommand(1.5),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(0, -48, new Rotation2d((Math.PI / 180) * 180))))),
+            // Move to auto align starting position
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(0, -48, new Rotation2d((Math.PI / 180) * 180))))),
 
-    // Move again to auto align position
-    new ParallelDeadlineGroup(new WaitCommand(1.5),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(60, -48, new Rotation2d((Math.PI / 180) * 180)))),
-            new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
-            new SetDifferentialLevelInstantCommand(sensors, 4),
-            new IntakeControlCommand(intake, sensors, -1.0, false),
-            new ElevatorPIDControlCommand(elevator, sensors),
-            new DifferentialPIDControlCommand(differential, sensors)),
+            // Move again to auto align position
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(60, -48, new Rotation2d((Math.PI / 180) * 180)))),
+                    new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+                    new SetDifferentialLevelInstantCommand(sensors, 4),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
 
-    new SetLRCSelectorInstantCommand(sensors, 1),
-    new SetIsFieldCentricInstantCommand(sensors, false),
+            new SetLRCSelectorInstantCommand(sensors, 1),
+            new SetIsFieldCentricInstantCommand(sensors, false),
 
-    // Auto Align using Vision to April Tags
-    new ParallelDeadlineGroup(new WaitCommand(2.5),
-            new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
-            new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
-                    () -> false),
-            new IntakeControlCommand(intake, sensors, -1.0, false),
-            new ElevatorPIDControlCommand(elevator, sensors),
-            new DifferentialPIDControlCommand(differential, sensors)),
+            // Auto Align using Vision to April Tags
+            new ParallelDeadlineGroup(new WaitCommand(2.5),
+                    new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+                            () -> false),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
 
-    // Outputs coral onto the L4 Reef
-    new ParallelDeadlineGroup(new WaitCommand(1.5),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(60, -48, new Rotation2d((Math.PI / 180) * 180)))),
-            new SetDifferentialLevelInstantCommand(sensors, 24),
-            new SequentialCommandGroup(
-                    new ParallelDeadlineGroup(new WaitCommand(0.2),
-                            new DifferentialPIDControlCommand(differential, sensors)),
-                    new ParallelDeadlineGroup(new WaitCommand(0.4),
-                            new ElevatorPIDControlCommand(elevator, sensors)))),
+            // Outputs coral onto the L4 Reef
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(60, -48, new Rotation2d((Math.PI / 180) * 180)))),
+                    new SetDifferentialLevelInstantCommand(sensors, 24),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.2),
+                                    new DifferentialPIDControlCommand(differential, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(0.4),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
 
-    // Stop moving and retract scoring elements to home position
-    new ParallelDeadlineGroup(new WaitCommand(2),
-            new SetDifferentialLevelInstantCommand(sensors, 0),
-            new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
-                    () -> true),
-            new ElevatorPIDControlCommand(elevator, sensors),
-            new DifferentialPIDControlCommand(differential, sensors)),
+            // Stop moving and retract scoring elements to home position
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+                            () -> true),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
 
-    new SetIsFieldCentricInstantCommand(sensors, true),
+            new SetIsFieldCentricInstantCommand(sensors, true),
 
-    new ParallelDeadlineGroup(new WaitCommand(2),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(60, -48, new Rotation2d((Math.PI / 180) * 60))))),
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(60, -48, new Rotation2d((Math.PI / 180) * 60))))),
 
-    new ParallelDeadlineGroup(new WaitCommand(4),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(127, 68, new Rotation2d((Math.PI / 180) * 60))))),
+            new ParallelDeadlineGroup(new WaitCommand(4),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(127, 68, new Rotation2d((Math.PI / 180) * 60))))),
 
-    new ParallelDeadlineGroup(new WaitCommand(4),
-        new AutonDriveCommand(driveTrain,
-                    (new Pose2d(262, 78, new Rotation2d((Math.PI / 180) * 60)))))
-    );
+            new ParallelDeadlineGroup(new WaitCommand(4),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(262, 78, new Rotation2d((Math.PI / 180) * 60))))));
     // #endregion PushRightL4
 
     // #region PushLeftL4
     private final Command PushLeftL4 = new SequentialCommandGroup(
-        new InstantCommand(
-            () -> driveTrain.resetPose(
-                    new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180))),
-            driveTrain),
+            new InstantCommand(
+                    () -> driveTrain.resetPose(
+                            new Pose2d(0, 0, new Rotation2d((Math.PI / 180) * 180))),
+                    driveTrain),
 
-    // Move the other bot fowards
-    new ParallelDeadlineGroup(new WaitCommand(0.5),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(5, 0, new Rotation2d((Math.PI / 180) * 180))))),
+            // Move the other bot fowards
+            new ParallelDeadlineGroup(new WaitCommand(0.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(5, 0, new Rotation2d((Math.PI / 180) * 180))))),
 
-    // Move to auto align starting position
-    new ParallelDeadlineGroup(new WaitCommand(1.5),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(0, 48, new Rotation2d((Math.PI / 180) * 180))))),
+            // Move to auto align starting position
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(0, 48, new Rotation2d((Math.PI / 180) * 180))))),
 
-    // Move again to auto align position
-    new ParallelDeadlineGroup(new WaitCommand(1.5),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(60, 48, new Rotation2d((Math.PI / 180) * 180)))),
-            new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
-            new SetDifferentialLevelInstantCommand(sensors, 4),
-            new IntakeControlCommand(intake, sensors, -1.0, false),
-            new ElevatorPIDControlCommand(elevator, sensors),
-            new DifferentialPIDControlCommand(differential, sensors)),
+            // Move again to auto align position
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(60, 48, new Rotation2d((Math.PI / 180) * 180)))),
+                    new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+                    new SetDifferentialLevelInstantCommand(sensors, 4),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
 
-    new SetLRCSelectorInstantCommand(sensors, 0),
-    new SetIsFieldCentricInstantCommand(sensors, false),
+            new SetLRCSelectorInstantCommand(sensors, 0),
+            new SetIsFieldCentricInstantCommand(sensors, false),
 
-    // Auto Align using Vision to April Tags
-    new ParallelDeadlineGroup(new WaitCommand(2.5),
-            new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
-            new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
-                    () -> false),
-            new IntakeControlCommand(intake, sensors, -1.0, false),
-            new ElevatorPIDControlCommand(elevator, sensors),
-            new DifferentialPIDControlCommand(differential, sensors)),
+            // Auto Align using Vision to April Tags
+            new ParallelDeadlineGroup(new WaitCommand(2.5),
+                    new FunnelPIDControlCommand(funnel, FunnelMapping.LOWER_FUN),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+                            () -> false),
+                    new IntakeControlCommand(intake, sensors, -1.0, false),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
 
-    // Outputs coral onto the L4 Reef
-    new ParallelDeadlineGroup(new WaitCommand(1.5),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(60, 48, new Rotation2d((Math.PI / 180) * 180)))),
-            new SetDifferentialLevelInstantCommand(sensors, 24),
-            new SequentialCommandGroup(
-                    new ParallelDeadlineGroup(new WaitCommand(0.2),
-                            new DifferentialPIDControlCommand(differential, sensors)),
-                    new ParallelDeadlineGroup(new WaitCommand(0.4),
-                            new ElevatorPIDControlCommand(elevator, sensors)))),
+            // Outputs coral onto the L4 Reef
+            new ParallelDeadlineGroup(new WaitCommand(1.5),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(60, 48, new Rotation2d((Math.PI / 180) * 180)))),
+                    new SetDifferentialLevelInstantCommand(sensors, 24),
+                    new SequentialCommandGroup(
+                            new ParallelDeadlineGroup(new WaitCommand(0.2),
+                                    new DifferentialPIDControlCommand(differential, sensors)),
+                            new ParallelDeadlineGroup(new WaitCommand(0.4),
+                                    new ElevatorPIDControlCommand(elevator, sensors)))),
 
-    // Stop moving and retract scoring elements to home position
-    new ParallelDeadlineGroup(new WaitCommand(2),
-            new SetDifferentialLevelInstantCommand(sensors, 0),
-            new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
-                    () -> true),
-            new ElevatorPIDControlCommand(elevator, sensors),
-            new DifferentialPIDControlCommand(differential, sensors)),
+            // Stop moving and retract scoring elements to home position
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new SetDifferentialLevelInstantCommand(sensors, 0),
+                    new SwerveDriveManualCommand(driveTrain, sensors, () -> 0.0, () -> 0.0, () -> 0.0, () -> 0.0,
+                            () -> true),
+                    new ElevatorPIDControlCommand(elevator, sensors),
+                    new DifferentialPIDControlCommand(differential, sensors)),
 
-    new SetIsFieldCentricInstantCommand(sensors, true),
+            new SetIsFieldCentricInstantCommand(sensors, true),
 
-    new ParallelDeadlineGroup(new WaitCommand(2),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(60, 48, new Rotation2d((Math.PI / 180) * 300))))),
+            new ParallelDeadlineGroup(new WaitCommand(2),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(60, 48, new Rotation2d((Math.PI / 180) * 300))))),
 
-    new ParallelDeadlineGroup(new WaitCommand(4),
-            new AutonDriveCommand(driveTrain,
-                    (new Pose2d(127, -68, new Rotation2d((Math.PI / 180) * 300))))),
+            new ParallelDeadlineGroup(new WaitCommand(4),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(127, -68, new Rotation2d((Math.PI / 180) * 300))))),
 
-    new ParallelDeadlineGroup(new WaitCommand(4),
-        new AutonDriveCommand(driveTrain,
-                    (new Pose2d(262, -78, new Rotation2d((Math.PI / 180) * 300)))))
-    );
+            new ParallelDeadlineGroup(new WaitCommand(4),
+                    new AutonDriveCommand(driveTrain,
+                            (new Pose2d(262, -78, new Rotation2d((Math.PI / 180) * 300))))));
     // #endregion PushLeftL4
 
     // #region RightStation Competition Ready
@@ -516,6 +757,7 @@ public class RobotContainer {
     // #endregion RightStation
 
     // #region LeftStation Competition Ready
+
     private final Command LeftStation = new SequentialCommandGroup(
             // new ResetGyroYawInstantCommand(driveTrain),
             new InstantCommand(
@@ -845,13 +1087,15 @@ public class RobotContainer {
     // #endregion
 
     public Command getAutonomousCommand() {
-        // return LeftL4Single;
         // return RightL4Single;
-        // return CenterRightL4;
-        // return CenterLeftL4;
-        // return LeftStation;
-        // return RightStation;
-        return PushRightL4;
-        // return PushLeftL4;
+        // return LeftL4Single;
+        // return CenterRightL4; // Ready
+        // return CenterLeftL4; // Ready
+        // return RightBreakout; // Ready
+        // return LeftBreakout; // Ready
+        return RightStation; // Ready
+        // return LeftStation; // Ready
+        // return PushRightL4; // Ready
+        // return PushLeftL4; // Ready
     }
 }
