@@ -6,7 +6,7 @@ package frc.robot.Commands;
 
 import java.util.function.DoubleSupplier;
 
-import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Climb;
 import frc.robot.Subsystems.Sensors;
